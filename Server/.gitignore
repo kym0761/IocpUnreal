@@ -1,0 +1,7 @@
+/.vs
+/Binary
+x64
+__pycache__
+/Libraries/Libs/ServerCore
+GenProcs.exe
+GenPackets.exe

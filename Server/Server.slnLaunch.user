@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Name": "GameServer\\GameServer.vcxproj",
+        "Action": "Start",
+        "DebugTarget": ""
+      },
+      {
+        "Name": "DummyClient\\DummyClient.vcxproj",
+        "Action": "Start",
+        "DebugTarget": ""
+      }
+    ]
+  }
+]
