@@ -2,6 +2,10 @@
 
 #include "Protocol.pb.h"
 
+#if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
+#include "IocpTest.h"
+#endif
+
 using PacketHandlerFunc = std::function<bool(PacketSessionRef&, BYTE*, int32)>; //함수 포인터
 extern PacketHandlerFunc GPacketHandler[UINT16_MAX]; //필요할지도 모르는 함수 포인터들을 미리 만든다.
 
@@ -85,11 +89,17 @@ private:
 		const uint16 dataSize = static_cast<uint16>(pkt.ByteSizeLong());
 		const uint16 packetSize = dataSize + sizeof(FPacketHeader);
 
-		SendBufferRef sendBuffer = GSendBufferManager->Open(packetSize);
+#if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
+		SendBufferRef sendBuffer = MakeShared<FSendBuffer>(packetSize);
+#else
+		SendBufferRef sendBuffer = make_shared<FSendBuffer>(packetSize);
+#endif
+
+		//SendBufferRef sendBuffer = GSendBufferManager->Open(packetSize);
 		FPacketHeader* header = reinterpret_cast<FPacketHeader*>(sendBuffer->GetBuffer());
 		header->size = packetSize;
 		header->id = pktId;
-		ASSERT_CRASH(pkt.SerializeToArray(&header[1], dataSize));
+		pkt.SerializeToArray(&header[1], dataSize);
 		sendBuffer->Close(packetSize);
 
 		return sendBuffer;

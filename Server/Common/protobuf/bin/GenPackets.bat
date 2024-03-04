@@ -25,6 +25,15 @@ XCOPY /Y Protocol.pb.h "../../../DummyClient"
 XCOPY /Y Protocol.pb.cc "../../../DummyClient"
 XCOPY /Y ClientPacketHandler.h "../../../DummyClient"
 
+XCOPY /Y Enum.pb.h "../../../../IocpTest/Source/IocpTest/Network"
+XCOPY /Y Enum.pb.cc "../../../../IocpTest/Source/IocpTest/Network"
+XCOPY /Y Struct.pb.h "../../../../IocpTest/Source/IocpTest/Network"
+XCOPY /Y Struct.pb.cc "../../../../IocpTest/Source/IocpTest/Network"
+XCOPY /Y Protocol.pb.h "../../../../IocpTest/Source/IocpTest/Network"
+XCOPY /Y Protocol.pb.cc "../../../../IocpTest/Source/IocpTest/Network"
+XCOPY /Y ClientPacketHandler.h "../../../../IocpTest/Source/IocpTest/Network"
+
+
 DEL /Q /F *pb.h
 DEL /Q /F *pb.cc
 DEL /Q /F *.h

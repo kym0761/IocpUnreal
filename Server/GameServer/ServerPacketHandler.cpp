@@ -102,7 +102,7 @@ bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
 
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 {
-	////cout << pkt.msg() << endl;
+	cout << pkt.msg() << endl;
 	//cout << "received c_chat" << endl;
 
 	////모든 클라이언트에게 전달.

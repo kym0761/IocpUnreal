@@ -2,101 +2,108 @@
 
 #include "Protocol.pb.h"
 
-//using PacketHandlerFunc = std::function<bool(PacketSessionRef&, BYTE*, int32)>; //í•¨ìˆ˜ í¬ì¸í„°
-//extern PacketHandlerFunc GPacketHandler[UINT16_MAX]; //í•„ìš”í• ì§€ë„ ëª¨ë¥´ëŠ” í•¨ìˆ˜ í¬ì¸í„°ë“¤ì„ ë¯¸ë¦¬ ë§Œë“ ë‹¤.
-//
-//// TODO : ìë™í™”
-//enum : uint16
-//{
-//	PKT_C_LOGIN = 1000,
-//	PKT_S_LOGIN = 1001,
-//	PKT_C_ENTER_GAME = 1002,
-//	PKT_S_ENTER_GAME = 1003,
-//	PKT_C_CHAT = 1004,
-//	PKT_S_CHAT = 1005,
-//};
-//
-//
-//
-//// Custom Handlers
-////ì´ í•¨ìˆ˜ êµ¬í˜„ì€ ì‚¬ìš©ìê°€ ì§ì ‘ ë§Œë“¤ì–´ì•¼ í•¨.
-//// ì´ìœ ? ìë™í™” ì‹œìŠ¤í…œì€ ì´ í•¨ìˆ˜ê°€ ì–´ë–¤ ê¸°ëŠ¥ì„ í• ì§€ ì•Œ ìˆ˜ ì—†ë‹¤..
-//bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len);
-//
-////ì„ ì–¸ë§Œ ìë™í™”
-//bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt);
-//bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt);
-//bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt);
-//
-//
-//class FClientPacketHandler
-//{
-//public:
-//
-//	// TODO : ìë™í™”
-//	static void Init()
-//	{
-//		for (int32 i = 0; i < UINT16_MAX; i++)
-//		{
-//			GPacketHandler[i] = Handle_INVALID; //í•¨ìˆ˜ì— ì¼ë‹¨ HANDLE INVALIDë¥¼ ë“±ë¡
-//		}
-//
-//		//íŒ¨í‚·ì´ ëŠ˜ì–´ë‚  ë–„ë§ˆë‹¤ ì¶”ê°€í•˜ëŠ” ìë™í™” í•„ìš”.
-//		//PKT_S_TESTì— ëŒ€í•œ í•¨ìˆ˜ ë“±ë¡
-//		GPacketHandler[PKT_S_LOGIN] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_LOGIN>(Handle_S_LOGIN, session, buffer, len); };
-//		GPacketHandler[PKT_S_ENTER_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_ENTER_GAME>(Handle_S_ENTER_GAME, session, buffer, len); };
-//		GPacketHandler[PKT_S_CHAT] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_CHAT>(Handle_S_CHAT, session, buffer, len); };
-//	}
-//
-//	//ì–´ë–¤ í´ë¼ì´ì–¸íŠ¸ê°€ íŒ¨í‚·ì„ ë³´ë‚¸ ê²ƒì¸ì§€ í™•ì¸í•˜ê¸° ìœ„í•´ sessionrefë¥¼ ë°›ëŠ”ë‹¤.
-//	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
-//	{
-//		FPacketHeader* header = reinterpret_cast<FPacketHeader*>(buffer);
-//
-//		//í—¤ë” idì— ë§ëŠ” íŒ¨í‚· handle í•¨ìˆ˜ë¥¼ í˜¸ì¶œ
-//		//ì´ìƒí•œ id..ì˜ˆë¥¼ ë“¤ë©´ ì•„ì˜ˆ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” idë¼ë©´
-//		//ì• ì´ˆì— HANDLE_INVALIDë¡œ ë§‰ì•„ë†“ìœ¼ë‹ˆ ìƒê´€ì—†ìŒ.
-//		return GPacketHandler[header->id](session, buffer, len);
-//	}
-//
-//	// TODO : ìë™í™”
-//	static SendBufferRef MakeSendBuffer(Protocol::C_LOGIN& pkt) { return MakeSendBuffer(pkt, PKT_C_LOGIN); }
-//	static SendBufferRef MakeSendBuffer(Protocol::C_ENTER_GAME& pkt) { return MakeSendBuffer(pkt, PKT_C_ENTER_GAME); }
-//	static SendBufferRef MakeSendBuffer(Protocol::C_CHAT& pkt) { return MakeSendBuffer(pkt, PKT_C_CHAT); }
-//
-//private:
-//
-//	template<typename PacketType, typename ProcessFunc>
-//	static bool HandlePacket(ProcessFunc func, PacketSessionRef& session, BYTE* buffer, int32 len)
-//	{
-//		//íŒ¨í‚·ì„ ë°›ì•„ì£¼ëŠ” ì—­í• .
-//		PacketType pkt;
-//		if (pkt.ParseFromArray(
-//			buffer + sizeof(FPacketHeader),
-//			len - sizeof(FPacketHeader)) == false)
-//		{
-//			return false;
-//		}
-//
-//		//ë§Œë“  íŒ¨í‚·ì„ funcë¡œ ë™ì‘ì‹œí‚´.
-//		return func(session, pkt);
-//	}
-//
-//	template<typename T>
-//	static SendBufferRef MakeSendBuffer(T& pkt, uint16 pktId)
-//	{
-//		const uint16 dataSize = static_cast<uint16>(pkt.ByteSizeLong());
-//		const uint16 packetSize = dataSize + sizeof(FPacketHeader);
-//
-//		//SendBufferRef sendBuffer = GSendBufferManager->Open(packetSize);
-//		//FPacketHeader* header = reinterpret_cast<FPacketHeader*>(sendBuffer->GetBuffer());
-//		SendBufferRef sendBuffer = make_shared<FSendBuffer>(packetSize);
-//		FPacketHeader* header = reinterpret_cast<FPacketHeader*>(sendBuffer->GetBuffer());
-//		header->size = packetSize;
-//		header->id = pktId;
-//		ASSERT_CRASH(pkt.SerializeToArray(&header[1], dataSize));
-//		sendBuffer->Close(packetSize);
-//
-//		return sendBuffer;
-//	}
-//};
+#if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
+#include "IocpTest.h"
+#endif
+
+using PacketHandlerFunc = std::function<bool(PacketSessionRef&, BYTE*, int32)>; //ÇÔ¼ö Æ÷ÀÎÅÍ
+extern PacketHandlerFunc GPacketHandler[UINT16_MAX]; //ÇÊ¿äÇÒÁöµµ ¸ğ¸£´Â ÇÔ¼ö Æ÷ÀÎÅÍµéÀ» ¹Ì¸® ¸¸µç´Ù.
+
+// TODO : ÀÚµ¿È­
+enum : uint16
+{
+	PKT_C_LOGIN = 1000,
+	PKT_S_LOGIN = 1001,
+	PKT_C_ENTER_GAME = 1002,
+	PKT_S_ENTER_GAME = 1003,
+	PKT_C_CHAT = 1004,
+	PKT_S_CHAT = 1005,
+};
+
+
+
+// Custom Handlers
+//ÀÌ ÇÔ¼ö ±¸ÇöÀº »ç¿ëÀÚ°¡ Á÷Á¢ ¸¸µé¾î¾ß ÇÔ.
+// ÀÌÀ¯? ÀÚµ¿È­ ½Ã½ºÅÛÀº ÀÌ ÇÔ¼ö°¡ ¾î¶² ±â´ÉÀ» ÇÒÁö ¾Ë ¼ö ¾ø´Ù..
+bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len);
+
+//¼±¾ğ¸¸ ÀÚµ¿È­
+bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt);
+bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt);
+bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt);
+
+
+class FClientPacketHandler
+{
+public:
+
+	// TODO : ÀÚµ¿È­
+	static void Init()
+	{
+		for (int32 i = 0; i < UINT16_MAX; i++)
+		{
+			GPacketHandler[i] = Handle_INVALID; //ÇÔ¼ö¿¡ ÀÏ´Ü HANDLE INVALID¸¦ µî·Ï
+		}
+
+		//ÆĞÅ¶ÀÌ ´Ã¾î³¯ ‹š¸¶´Ù Ãß°¡ÇÏ´Â ÀÚµ¿È­ ÇÊ¿ä.
+		//PKT_S_TEST¿¡ ´ëÇÑ ÇÔ¼ö µî·Ï
+		GPacketHandler[PKT_S_LOGIN] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_LOGIN>(Handle_S_LOGIN, session, buffer, len); };
+		GPacketHandler[PKT_S_ENTER_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_ENTER_GAME>(Handle_S_ENTER_GAME, session, buffer, len); };
+		GPacketHandler[PKT_S_CHAT] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_CHAT>(Handle_S_CHAT, session, buffer, len); };
+	}
+
+	//¾î¶² Å¬¶óÀÌ¾ğÆ®°¡ ÆĞÅ¶À» º¸³½ °ÍÀÎÁö È®ÀÎÇÏ±â À§ÇØ sessionref¸¦ ¹Ş´Â´Ù.
+	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
+	{
+		FPacketHeader* header = reinterpret_cast<FPacketHeader*>(buffer);
+
+		//Çì´õ id¿¡ ¸Â´Â ÆĞÅ¶ handle ÇÔ¼ö¸¦ È£Ãâ
+		//ÀÌ»óÇÑ id..¿¹¸¦ µé¸é ¾Æ¿¹ Á¸ÀçÇÏÁö ¾Ê´Â id¶ó¸é
+		//¾ÖÃÊ¿¡ HANDLE_INVALID·Î ¸·¾Æ³õÀ¸´Ï »ó°ü¾øÀ½.
+		return GPacketHandler[header->id](session, buffer, len);
+	}
+
+	// TODO : ÀÚµ¿È­
+	static SendBufferRef MakeSendBuffer(Protocol::C_LOGIN& pkt) { return MakeSendBuffer(pkt, PKT_C_LOGIN); }
+	static SendBufferRef MakeSendBuffer(Protocol::C_ENTER_GAME& pkt) { return MakeSendBuffer(pkt, PKT_C_ENTER_GAME); }
+	static SendBufferRef MakeSendBuffer(Protocol::C_CHAT& pkt) { return MakeSendBuffer(pkt, PKT_C_CHAT); }
+
+private:
+
+	template<typename PacketType, typename ProcessFunc>
+	static bool HandlePacket(ProcessFunc func, PacketSessionRef& session, BYTE* buffer, int32 len)
+	{
+		//ÆĞÅ¶À» ¹Ş¾ÆÁÖ´Â ¿ªÇÒ.
+		PacketType pkt;
+		if (pkt.ParseFromArray(
+			buffer + sizeof(FPacketHeader),
+			len - sizeof(FPacketHeader)) == false)
+		{
+			return false;
+		}
+
+		//¸¸µç ÆĞÅ¶À» func·Î µ¿ÀÛ½ÃÅ´.
+		return func(session, pkt);
+	}
+
+	template<typename T>
+	static SendBufferRef MakeSendBuffer(T& pkt, uint16 pktId)
+	{
+		const uint16 dataSize = static_cast<uint16>(pkt.ByteSizeLong());
+		const uint16 packetSize = dataSize + sizeof(FPacketHeader);
+
+#if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
+		SendBufferRef sendBuffer = MakeShared<FSendBuffer>(packetSize);
+#else
+		SendBufferRef sendBuffer = make_shared<FSendBuffer>(packetSize);
+#endif
+
+		FPacketHeader* header = reinterpret_cast<FPacketHeader*>(sendBuffer->GetBuffer());
+		header->size = packetSize;
+		header->id = pktId;
+		pkt.SerializeToArray(&header[1], dataSize);
+		sendBuffer->Close(packetSize);
+
+		return sendBuffer;
+	}
+};

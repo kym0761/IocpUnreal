@@ -81,7 +81,19 @@ int main()
 	}
 
 	//Main Thread도 따로 실행
-	DoWorkerJob(service);
+	//DoWorkerJob(service);
+
+	while (true)
+	{
+		Protocol::S_CHAT pkt;
+		pkt.set_msg("Hello Unreal");
+		auto sendBuffer = FServerPacketHandler::MakeSendBuffer(pkt);
+
+		GSessionManager.Broadcast(sendBuffer);
+		this_thread::sleep_for(1s);
+
+	}
+
 
 	GThreadManager->Join();
 
