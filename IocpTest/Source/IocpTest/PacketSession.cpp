@@ -17,6 +17,7 @@ FPacketSession::FPacketSession(class FSocket* Socket) : Socket(Socket)
 
 FPacketSession::~FPacketSession()
 {
+	Disconnect();
 }
 
 void FPacketSession::Run()
@@ -32,14 +33,16 @@ void FPacketSession::HandleRecvPackets()
 
 	while (true)
 	{
-		TArray<uint8> Packet;
-		if (RecvPacketQueue.Dequeue(OUT Packet) == false)
+		TArray<uint8> packet;
+		if (RecvPacketQueue.Dequeue(OUT packet) == false)
 		{
 			break;
 		}
 			
+		//세션 자체의 sharedptr
 		PacketSessionRef ThisPtr = AsShared();
-		FClientPacketHandler::HandlePacket(ThisPtr, Packet.GetData(), Packet.Num());
+		
+		FClientPacketHandler::HandlePacket(ThisPtr, packet.GetData(), packet.Num());
 	}
 
 

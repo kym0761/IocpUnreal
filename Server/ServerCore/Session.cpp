@@ -38,13 +38,12 @@ void FSession::Send(SendBufferRef sendBuffer)
 		{
 			bRegisterSend = true;
 		}
-	}
 
-	if (bRegisterSend)
-	{
-		RegisterSend();
+		if (bRegisterSend)
+		{
+			RegisterSend();
+		}
 	}
-		
 }
 
 bool FSession::Connect()
@@ -194,7 +193,7 @@ void FSession::RegisterSend()
 
 	// 보낼 데이터를 SendEvent에 등록
 	{
-		WRITE_LOCK;
+		//WRITE_LOCK;
 
 		int32 writeSize = 0;
 		while (SendQueue.empty() == false)

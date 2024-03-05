@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 
+
 struct IOCPTEST_API FPacketHeader
 {
 	FPacketHeader() : size(0), id(0)
@@ -58,3 +59,13 @@ private:
 USING_SHARED_PTR(Session); // SessionRef = TSharedPTr<FSession>;
 USING_SHARED_PTR(PacketSession);
 USING_SHARED_PTR(SendBuffer);
+
+
+#include "ClientPacketHandler.h"
+#include "TestGameInstance.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
+
+#define SEND_PACKET(Pkt)														\
+	SendBufferRef SendBuffer = FClientPacketHandler::MakeSendBuffer(Pkt);		\
+	Cast<UTestGameInstance>(GWorld->GetGameInstance())->SendPacket(SendBuffer);

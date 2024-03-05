@@ -27,6 +27,7 @@ public:
 public:
 	class FSocket* Socket;
 
+	/*실제로 Send Receive를 할 스레드*/
 	TSharedPtr<class FRecvWorker> RecvWorkerThread;
 	TSharedPtr<class FSendWorker> SendWorkerThread;
 

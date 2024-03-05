@@ -8,17 +8,17 @@
 
 class FSocket;
 
-//struct S1_API FPacketHeader
+//struct IOCPTEST_API FWorkPacketHeader
 //{
-//	FPacketHeader() : PacketSize(0), PacketID(0)
+//	FWorkPacketHeader() : PacketSize(0), PacketID(0)
 //	{
 //	}
 //
-//	FPacketHeader(uint16 PacketSize, uint16 PacketID) : PacketSize(PacketSize), PacketID(PacketID)
+//	FWorkPacketHeader(uint16 PacketSize, uint16 PacketID) : PacketSize(PacketSize), PacketID(PacketID)
 //	{
 //	}
 //
-//	friend FArchive& operator<<(FArchive& Ar, FPacketHeader& Header)
+//	friend FArchive& operator<<(FArchive& Ar, FWorkPacketHeader& Header)
 //	{
 //		Ar << Header.PacketSize;
 //		Ar << Header.PacketID;
@@ -46,7 +46,7 @@ public:
 	void Destroy();
 
 private:
-	bool ReceivePacket(TArray<uint8>& OutPacket);
+	bool TryReceivePacket(TArray<uint8>& OutPacket);
 	bool ReceiveDesiredBytes(uint8* Results, int32 Size);
 
 protected:

@@ -17,6 +17,5 @@ public:
 	virtual void OnSend(int32 len) override;
 
 public:
-
-	weak_ptr<class FRoom> Room; //담당중인 Room
+	atomic<PlayerRef> Player;
 };

@@ -4,20 +4,11 @@
     <Filter Include="Main">
       <UniqueIdentifier>{93c7ab7e-dfdb-41c9-9adf-193caa5fb832}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Utils">
-      <UniqueIdentifier>{248c714a-3ff0-4c61-824a-f923e633b444}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Unused">
       <UniqueIdentifier>{022d5927-21be-4f34-9ad9-33c6ec6771a4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Protobuf">
       <UniqueIdentifier>{7f82a317-a0c4-4157-8647-489d6a1c3c38}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Utils\Proto">
-      <UniqueIdentifier>{4e07263d-aae2-4a4a-8dd0-ac16460adc12}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Utils\Common/Templates">
-      <UniqueIdentifier>{dad1ac2e-f33a-4b7e-9404-609996560ab6}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameContents/NotUse">
       <UniqueIdentifier>{f1190c23-5755-41fd-926e-21f8e12a7fb4}</UniqueIdentifier>
@@ -27,6 +18,18 @@
     </Filter>
     <Filter Include="DB/NotUse\Common/Templates">
       <UniqueIdentifier>{2cc17645-879c-4cf6-af71-731e97bdce1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProtoUtils">
+      <UniqueIdentifier>{248c714a-3ff0-4c61-824a-f923e633b444}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProtoUtils\Proto">
+      <UniqueIdentifier>{4e07263d-aae2-4a4a-8dd0-ac16460adc12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ProtoUtils\Common/Templates">
+      <UniqueIdentifier>{dad1ac2e-f33a-4b7e-9404-609996560ab6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ServerUtils">
+      <UniqueIdentifier>{d1a199be-22df-4661-92ec-d1f0e7c55bcf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -78,6 +81,12 @@
     <ClCompile Include="pch.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="ServerUtils.cpp">
+      <Filter>ServerUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectUtils.cpp">
+      <Filter>ServerUtils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConcurrentQueue.h">
@@ -111,7 +120,7 @@
       <Filter>Protobuf</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\protobuf\bin\Templates\PacketHandler.h">
-      <Filter>Utils\Common/Templates</Filter>
+      <Filter>ProtoUtils\Common/Templates</Filter>
     </ClInclude>
     <ClInclude Include="Room.h">
       <Filter>GameContents/NotUse</Filter>
@@ -134,19 +143,25 @@
     <ClInclude Include="pch.h">
       <Filter>Main</Filter>
     </ClInclude>
+    <ClInclude Include="ObjectUtils.h">
+      <Filter>ServerUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerUtils.h">
+      <Filter>ServerUtils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Common\protobuf\bin\Struct.proto">
-      <Filter>Utils\Proto</Filter>
+      <Filter>ProtoUtils\Proto</Filter>
     </None>
     <None Include="..\Common\protobuf\bin\Protocol.proto">
-      <Filter>Utils\Proto</Filter>
+      <Filter>ProtoUtils\Proto</Filter>
     </None>
     <None Include="..\Common\protobuf\bin\Enum.proto">
-      <Filter>Utils\Proto</Filter>
+      <Filter>ProtoUtils\Proto</Filter>
     </None>
     <None Include="..\Common\protobuf\bin\GenPackets.bat">
-      <Filter>Utils\Proto</Filter>
+      <Filter>ProtoUtils\Proto</Filter>
     </None>
     <None Include="..\Common\Procedures\GenProcs.bat">
       <Filter>DB/NotUse</Filter>

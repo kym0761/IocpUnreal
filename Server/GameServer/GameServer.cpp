@@ -55,7 +55,7 @@ void DoWorkerJob(ServerServiceRef& service)
 
 int main()
 {
-	//cout << "Server Console Start\n";
+	cout << "Server Start\n";
 
 	FServerPacketHandler::Init();
 
@@ -85,11 +85,11 @@ int main()
 
 	while (true)
 	{
-		Protocol::S_CHAT pkt;
-		pkt.set_msg("Hello Unreal");
-		auto sendBuffer = FServerPacketHandler::MakeSendBuffer(pkt);
+		//Protocol::S_CHAT pkt;
+		//pkt.set_msg("Hello Unreal");
+		//auto sendBuffer = FServerPacketHandler::MakeSendBuffer(pkt);
 
-		GSessionManager.Broadcast(sendBuffer);
+		//GSessionManager.Broadcast(sendBuffer);
 		this_thread::sleep_for(1s);
 
 	}

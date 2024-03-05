@@ -21,6 +21,7 @@ FRecvWorker::~FRecvWorker()
 bool FRecvWorker::Init()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Recv Thread Init")));
+
 	return true;
 }
 
@@ -30,9 +31,8 @@ uint32 FRecvWorker::Run()
 	{
 		TArray<uint8> Packet;
 
-		if (ReceivePacket(OUT Packet))
+		if (TryReceivePacket(OUT Packet))
 		{
-
 			//Tshared로 변환하면서, 세션은 사용하는 동안은 절대 레퍼런스 해제가 되지 않을 것이다.
 			if (TSharedPtr<FPacketSession> session = WeakSessionRef.Pin())
 			{
@@ -40,6 +40,7 @@ uint32 FRecvWorker::Run()
 			}
 		}
 	}
+
 	return 0;
 }
 
@@ -49,64 +50,81 @@ void FRecvWorker::Exit()
 
 void FRecvWorker::Destroy()
 {
+	bRunning = false;
 }
 
-bool FRecvWorker::ReceivePacket(TArray<uint8>& OutPacket)
+bool FRecvWorker::TryReceivePacket(TArray<uint8>& OutPacket)
 {
 	// 패킷 헤더 파싱
-	const int32 HeaderSize = sizeof(FPacketHeader);
-	TArray<uint8> HeaderBuffer;
-	HeaderBuffer.AddZeroed(HeaderSize);
+	const int32 headerSize = sizeof(FPacketHeader);
+	TArray<uint8> headerBuffer;
+	headerBuffer.AddZeroed(headerSize);
 
-	if (ReceiveDesiredBytes(HeaderBuffer.GetData(), HeaderSize) == false)
+	if (ReceiveDesiredBytes(headerBuffer.GetData(), headerSize) == false)
+	{
 		return false;
+	}
 
 	// ID, Size 추출
-	FPacketHeader Header;
+	FPacketHeader header;
 	{
-		FMemoryReader Reader(HeaderBuffer);
-		Reader << Header;
+		FMemoryReader reader(headerBuffer);
+		reader << header;
 		UE_LOG(LogTemp, Log, 
 			TEXT("Recv PacketID : %d, PacketSize : %d"),
-			Header.id, Header.size);
+			header.id, header.size);
 	}
 
 	// 패킷 헤더 복사
-	OutPacket = HeaderBuffer;
+	OutPacket = headerBuffer;
 
 
 	// 패킷 내용 파싱
-	TArray<uint8> PayloadBuffer;
-	const int32 PayloadSize = Header.size - HeaderSize;
-	OutPacket.AddZeroed(PayloadSize);
+	TArray<uint8> payloadBuffer;
+	const int32 payloadSize = header.size - headerSize;
 
-	if (ReceiveDesiredBytes(&OutPacket[HeaderSize], PayloadSize))
+	//내용물이 하나도 안들어있으면, 아래에 그 이후 부분을 접근하려는 오류를 냄
+	//그러니 0일 때 예외처리 필요함.
+	if (payloadSize == 0)
+	{
 		return true;
+	}
+	
+	OutPacket.AddZeroed(payloadSize);
 
+	if (ReceiveDesiredBytes(&OutPacket[headerSize], payloadSize))
+	{
+		return true;
+	}
+		
 	return false;
-
-
 }
 
 bool FRecvWorker::ReceiveDesiredBytes(uint8* Results, int32 Size)
 {
-	uint32 PendingDataSize;
-	if (Socket->HasPendingData(PendingDataSize) == false || PendingDataSize <= 0)
-		return false;
+	uint32 pendingDataSize; //pending중인 데이터 사이즈
 
-	int32 Offset = 0;
+	if (Socket->HasPendingData(pendingDataSize) == false || pendingDataSize <= 0)
+	{
+		return false;
+	}
+
+	int32 offset = 0;
 
 	while (Size > 0)
 	{
-		int32 NumRead = 0;
-		Socket->Recv(Results + Offset, Size, OUT NumRead);
-		check(NumRead <= Size);
+		int32 numRead = 0;//얼마나 읽었는가?
 
-		if (NumRead <= 0)
+		Socket->Recv(Results + offset, Size, OUT numRead);
+		check(numRead <= Size);
+
+		if (numRead <= 0)
+		{
 			return false;
-
-		Offset += NumRead;
-		Size -= NumRead;
+		}
+		
+		offset += numRead;
+		Size -= numRead;
 	}
 
 	return true;
@@ -135,13 +153,13 @@ uint32 FSendWorker::Run()
 {
 	while (bRunning)
 	{
-		SendBufferRef SendBuffer;
+		SendBufferRef sendBuffer;
 
 		if (TSharedPtr<FPacketSession> session = WeakSessionRef.Pin())
 		{
-			if (session->SendPacketQueue.Dequeue(OUT SendBuffer))
+			if (session->SendPacketQueue.Dequeue(OUT sendBuffer))
 			{
-				SendPacket(SendBuffer);
+				SendPacket(sendBuffer);
 			}
 		}
 
@@ -172,12 +190,13 @@ bool FSendWorker::SendDesiredBytes(const uint8* Buffer, int32 Size)
 {
 	while (Size > 0)
 	{
-		int32 BytesSent = 0;
-		if (Socket->Send(Buffer, Size, BytesSent) == false)
+		int32 bytesSent = 0; //얼마나 보냈는가?
+
+		if (Socket->Send(Buffer, Size, bytesSent) == false)
 			return false;
 
-		Size -= BytesSent;
-		Buffer += BytesSent;
+		Size -= bytesSent;
+		Buffer += bytesSent;
 	}
 
 	return true;

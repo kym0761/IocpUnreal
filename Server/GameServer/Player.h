@@ -1,11 +1,19 @@
 #pragma once
-class FPlayer
+
+class FGameSession;
+class FRoom;
+
+class FPlayer : public enable_shared_from_this<FPlayer>
 {
 public:
+	FPlayer();
+	virtual ~FPlayer();
 
-	uint64					PlayerId = 0;
-	string					Name;
-	Protocol::PlayerType	Type = Protocol::PLAYER_TYPE_NONE;
-	GameSessionRef			OwnerSession; // Cycle 문제가 발생할 수 있음.
+public:
+	Protocol::PlayerInfo* PlayerInfo;
+	weak_ptr<FGameSession> Session;
+
+public:
+	atomic<weak_ptr<FRoom>> Room;
 };
 

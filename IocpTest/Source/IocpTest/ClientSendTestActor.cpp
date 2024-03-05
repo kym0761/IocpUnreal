@@ -26,11 +26,13 @@ void AClientSendTestActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
-	Protocol::C_CHAT Msg;
-	Msg.set_msg("Hello Server I am Unreal Client.");
-	SendBufferRef SendBuffer = FClientPacketHandler::MakeSendBuffer(Msg);
-	Cast<UTestGameInstance>(GetGameInstance())->SendPacket(SendBuffer);
+	//{
+	//	//테스트 메시지
+	//	Protocol::C_CHAT msg;
+	//	msg.set_msg("Hello Server I am Unreal Client.");
+	//	SendBufferRef SendBuffer = FClientPacketHandler::MakeSendBuffer(msg);
+	//	Cast<UTestGameInstance>(GetGameInstance())->SendPacket(SendBuffer);
+	//}
 
 }
 
