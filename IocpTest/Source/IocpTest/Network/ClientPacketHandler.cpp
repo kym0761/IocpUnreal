@@ -38,7 +38,7 @@ bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt)
 	if (UTestGameInstance* GameInstance 
 		= Cast<UTestGameInstance>(GWorld->GetGameInstance()))
 	{
-		GameInstance->HandleSpawn(pkt.player());
+		GameInstance->HandleSpawn(pkt);
 	}
 
 	return true;

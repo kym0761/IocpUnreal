@@ -8,14 +8,16 @@ public class IocpTest : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking" });
+		PublicDependencyModuleNames.AddRange(
+            new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking" ,"EnhancedInput" });
 
         PrivateDependencyModuleNames.AddRange(new string[] { "ProtobufCore" });
 
         PrivateIncludePaths.AddRange(new string[]
         {
             "IocpTest/",
-            "IocpTest/Network/"
+            "IocpTest/Network/",
+            "IocpTest/Game/"
         });
 
         // Uncomment if you are using Slate UI

@@ -9,6 +9,7 @@
 #include "PacketSession.h"
 #include "Protocol.pb.h"
 #include "ClientPacketHandler.h"
+#include "IocpBaseCharacter.h"
 
 void UTestGameInstance::ConnectToGameServer()
 {
@@ -90,7 +91,7 @@ void UTestGameInstance::SendPacket(SendBufferRef SendBuffer)
 	GameServerSession->SendPacket(SendBuffer);
 }
 
-void UTestGameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo)
+void UTestGameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool bIsMyPlayer)
 {
 	if (Socket == nullptr || GameServerSession == nullptr)
 		return;
@@ -105,25 +106,40 @@ void UTestGameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo)
 	{
 		return; //중복이 왜 있는지는 모르지만 끝낸다.
 	}
-		
+	
 	FVector SpawnLocation(PlayerInfo.x(), PlayerInfo.y(), PlayerInfo.z());
-	AActor* Actor = world->SpawnActor(PlayerBP, &SpawnLocation);
 
-	Players.Add(PlayerInfo.object_id(), Actor);
+	if (bIsMyPlayer)
+	{
+		auto* PC = UGameplayStatics::GetPlayerController(this, 0);
+		AIocpBaseCharacter* iocpCharacter = Cast<AIocpBaseCharacter>(PC->GetPawn());
+		if (iocpCharacter == nullptr)
+		{
+			return;
+		}
+		MyIocpCharacter = iocpCharacter;
+		Players.Add(PlayerInfo.object_id(), iocpCharacter);
+	}
+	else
+	{
+		AActor* Actor = world->SpawnActor(OtherPlayerBP, &SpawnLocation);
+		AIocpBaseCharacter* iocpCharacter = Cast<AIocpBaseCharacter>(Actor);
+		Players.Add(PlayerInfo.object_id(), iocpCharacter);
+	}
 
 
 }
 
 void UTestGameInstance::HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt)
 {
-	HandleSpawn(EnterGamePkt.player());
+	HandleSpawn(EnterGamePkt.player(), true);
 }
 
 void UTestGameInstance::HandleSpawn(const Protocol::S_SPAWN& SpawnPkt)
 {
 	for (const Protocol::PlayerInfo& Player : SpawnPkt.players())
 	{
-		HandleSpawn(Player);
+		HandleSpawn(Player, false);
 	}
 }
 
@@ -136,11 +152,11 @@ void UTestGameInstance::HandleDespawn(uint64 ObjectId)
 	if (World == nullptr)
 		return;
 
-	AActor** FindActor = Players.Find(ObjectId);
-	if (FindActor == nullptr)
+	AIocpBaseCharacter** foundActor = Players.Find(ObjectId);
+	if (foundActor == nullptr)
 		return;
 
-	World->DestroyActor(*FindActor);
+	World->DestroyActor(*foundActor);
 }
 
 void UTestGameInstance::HandleDespawn(const Protocol::S_DESPAWN& DespawnPkt)

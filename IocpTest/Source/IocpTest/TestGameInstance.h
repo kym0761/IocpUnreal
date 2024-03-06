@@ -8,7 +8,7 @@
 #include "TestGameInstance.generated.h"
 
 class FPacketSession;
-
+class AIocpBaseCharacter;
 /**
  * 
  */
@@ -36,7 +36,7 @@ public:
 	void SendPacket(SendBufferRef SendBuffer);
 
 public:
-	void HandleSpawn(const Protocol::PlayerInfo& PlayerInfo);
+	void HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool bIsMyPlayer);
 	void HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt);
 	void HandleSpawn(const Protocol::S_SPAWN& SpawnPkt);
 
@@ -53,8 +53,9 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor> PlayerBP;
+	TSubclassOf<AIocpBaseCharacter> OtherPlayerBP;
 
-	TMap<uint64, AActor*> Players;
+	AIocpBaseCharacter* MyIocpCharacter;
+	TMap<uint64, AIocpBaseCharacter*> Players;
 
 };
