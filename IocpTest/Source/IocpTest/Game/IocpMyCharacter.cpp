@@ -12,6 +12,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "IocpTest.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AIocpMyCharacter::AIocpMyCharacter()
@@ -56,17 +57,42 @@ void AIocpMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//어떠한 상황이 발생해서 바로 Send해야하는지 확인
+	bool bForceSendPacket = false;
+
+	if (LastDesiredInput != DesiredInput)
+	{
+		bForceSendPacket = true;
+		LastDesiredInput = DesiredInput;
+	}
+
+	// State 정보
+	if (DesiredInput == FVector2D::Zero())
+	{
+		SetMoveState(Protocol::MOVE_STATE_IDLE);
+	}
+	else
+	{
+		SetMoveState(Protocol::MOVE_STATE_RUN);
+	}
+
 	MovePacketSendTimer -= DeltaTime;
 
-	if (MovePacketSendTimer <= 0)
+	if (MovePacketSendTimer <= 0 || bForceSendPacket == true)
 	{
 		MovePacketSendTimer = MOVE_PACKET_SEND_DELAY;
 
 		Protocol::C_MOVE MovePkt;
 
 		{
-			auto tempInfo = MovePkt.mutable_info(); //수정가능한 info
-			tempInfo->CopyFrom(*PlayerInfo);
+			auto mutable_Info = MovePkt.mutable_info(); //수정가능한 info
+			mutable_Info->CopyFrom(*PlayerInfo); //먼저, 데이터는 그대로 복사
+
+			//state
+			mutable_Info->set_state(GetMoveState());
+
+			//yaw
+			mutable_Info->set_yaw(DesiredYaw);
 		}
 
 		SEND_PACKET(MovePkt);
@@ -86,7 +112,7 @@ void AIocpMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AIocpMyCharacter::Move);
-
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AIocpMyCharacter::Move); //wasd를 떼서 이동안할 때도 이를 동작시켜야함.
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AIocpMyCharacter::Look);
 	}
@@ -121,6 +147,21 @@ void AIocpMyCharacter::Move(const FInputActionValue& Value)
 		// add movement 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
+
+		//캐시 데이터 갱신
+		{
+			DesiredInput = MovementVector;
+
+			DesiredMoveDirection = FVector::ZeroVector;
+			DesiredMoveDirection += ForwardDirection * MovementVector.Y;
+			DesiredMoveDirection += RightDirection * MovementVector.X;
+			DesiredMoveDirection.Normalize();
+
+			const FVector Location = GetActorLocation();
+			FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(Location, Location + DesiredMoveDirection);
+			DesiredYaw = Rotator.Yaw;
+		}
+
 	}
 }
 

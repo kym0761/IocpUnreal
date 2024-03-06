@@ -198,8 +198,10 @@ void UTestGameInstance::HandleMove(const Protocol::S_MOVE& MovePkt)
 		return;
 
 	const Protocol::PlayerInfo& Info = MovePkt.info();
-	Player->SetPlayerInfo(Info);
-	//Player->SetDestInfo(Info);
+	
+	//목적지로 보정 이동하는 로직을 실행
+	//Player->SetPlayerInfo(Info);
+	Player->SetDestInfo(Info);
 
 
 }

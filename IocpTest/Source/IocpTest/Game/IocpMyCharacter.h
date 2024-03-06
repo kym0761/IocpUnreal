@@ -67,4 +67,14 @@ protected:
 	const float MOVE_PACKET_SEND_DELAY = 0.2f;
 	float MovePacketSendTimer = MOVE_PACKET_SEND_DELAY;
 
+
+	// 이동했는지 감지를 위한 캐시? 같은 변수
+	FVector2D DesiredInput;
+	FVector DesiredMoveDirection;
+	float DesiredYaw;
+
+	// Dirty Flag Test
+	//이전에 받았던 입력 값을 저장
+	FVector2D LastDesiredInput;
+
 };

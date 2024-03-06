@@ -39,15 +39,24 @@ AIocpBaseCharacter::AIocpBaseCharacter()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
-	//GetCharacterMovement()->bRunPhysicsWithNoController = true;
 
 	PlayerInfo = new Protocol::PlayerInfo();
+	DestInfo = new Protocol::PlayerInfo();
+
+	//aicontroller possess할 것이라 체크하지 않음.
+	// BP에서 세팅함
+	// C++에선 //AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	
+	//GetCharacterMovement()->bRunPhysicsWithNoController = true;
 }
 
 AIocpBaseCharacter::~AIocpBaseCharacter()
 {
 	delete PlayerInfo;
 	PlayerInfo = nullptr;
+
+	delete DestInfo;
+	DestInfo = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -55,6 +64,16 @@ void AIocpBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	{
+		FVector Location = GetActorLocation();
+		DestInfo->set_x(Location.X);
+		DestInfo->set_y(Location.Y);
+		DestInfo->set_z(Location.Z);
+		DestInfo->set_yaw(GetControlRotation().Yaw);
+
+		SetMoveState(Protocol::MOVE_STATE_IDLE);
+	}
+
 }
 
 // Called every frame
@@ -71,12 +90,53 @@ void AIocpBaseCharacter::Tick(float DeltaTime)
 		PlayerInfo->set_yaw(GetControlRotation().Yaw);
 	}
 
+	if (!IsMyCharacter())
+	{
+		/*이 방식은 애니메이션 처리가 되지 않음*/
+
+		//FVector Location = GetActorLocation();
+		//FVector DestLocation = FVector(DestInfo->x(), DestInfo->y(), DestInfo->z());
+
+		//FVector MoveDir = (DestLocation - Location);
+		//const float DistToDest = MoveDir.Length(); //최종 목적지 거리
+		//MoveDir.Normalize();
+
+		//float MoveDist = (MoveDir * 600.f * DeltaTime).Length();
+		//MoveDist = FMath::Min(MoveDist, DistToDest); //목적지와 너무 가까울 때 더 멀리가게 되는 부분을 방지
+		//FVector NextLocation = Location + MoveDir * MoveDist;
+
+		//SetActorLocation(NextLocation);
+
+		const Protocol::MoveState state = PlayerInfo->state();
+
+		if (state == Protocol::MOVE_STATE_RUN)
+		{
+			SetActorRotation(FRotator(0, DestInfo->yaw(), 0));
+
+
+			// 플레이어가 조종하지 않은 경우, run physics with no controller 옵션이 켜져야함.
+			//근데 사실 possess 세팅을 spawn & place world해서 aicontroller가 붙으면 딱히 문제 없다.
+			AddMovementInput(GetActorForwardVector());
+		}
+
+
+	}
+
 }
 
 bool AIocpBaseCharacter::IsMyCharacter()
 {
 	//myCharacter로 캐스팅해서 체크함.
 	return Cast<AIocpMyCharacter>(this) != nullptr;
+}
+
+void AIocpBaseCharacter::SetMoveState(Protocol::MoveState State)
+{
+	//같은 상태면 스킵함.
+	if (PlayerInfo->state() == State)
+		return;
+
+	PlayerInfo->set_state(State);
 }
 
 void AIocpBaseCharacter::SetPlayerInfo(const Protocol::PlayerInfo& Info)
@@ -92,5 +152,20 @@ void AIocpBaseCharacter::SetPlayerInfo(const Protocol::PlayerInfo& Info)
 
 	FVector Location(Info.x(), Info.y(), Info.z());
 	SetActorLocation(Location);
+}
+
+void AIocpBaseCharacter::SetDestInfo(const Protocol::PlayerInfo& Info)
+{
+	if (PlayerInfo->object_id() != 0) //object id를 변경하려는 시도가 있으면 비정상적임
+	{
+		assert(PlayerInfo->object_id() == Info.object_id());
+	}
+
+
+	//@!#$
+	DestInfo->CopyFrom(Info);
+
+	//상태는 즉시 적용
+	SetMoveState(Info.state());
 }
 
