@@ -72,6 +72,26 @@ bool Handle_C_LEAVE_GAME(PacketSessionRef& session, Protocol::C_LEAVE_GAME& pkt)
 	return true;
 }
 
+bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt)
+{
+	auto gameSession = static_pointer_cast<FGameSession>(session);
+
+	PlayerRef player = gameSession->Player.load();
+	if (player == nullptr)
+		return false;
+
+	RoomRef room = player->Room.load().lock();
+	if (room == nullptr)
+		return false;
+
+	// TODO
+
+	room->HandleMoveLocked(pkt);
+
+	return true;
+}
+
+
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 {
 	cout << pkt.msg() << endl;

@@ -13,11 +13,13 @@ public:
 	bool HandleEnterPlayerLocked(PlayerRef player);
 	bool HandleLeavePlayerLocked(PlayerRef player);
 
+	void HandleMoveLocked(Protocol::C_MOVE& pkt);
+
 private:
 	bool EnterPlayer(PlayerRef player);
 	bool LeavePlayer(uint64 objectId);
 
-	USE_LOCK;
+	USE_LOCK; //room에서 패킷을 처리할때마다 lock을 걸어야함.
 
 private:
 	//exceptId = 제외해야할 id

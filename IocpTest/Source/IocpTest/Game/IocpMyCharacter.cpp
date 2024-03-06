@@ -11,7 +11,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-
+#include "IocpTest.h"
 
 // Sets default values
 AIocpMyCharacter::AIocpMyCharacter()
@@ -29,6 +29,7 @@ AIocpMyCharacter::AIocpMyCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
 }
 
 // Called when the game starts or when spawned
@@ -54,6 +55,22 @@ void AIocpMyCharacter::BeginPlay()
 void AIocpMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	MovePacketSendTimer -= DeltaTime;
+
+	if (MovePacketSendTimer <= 0)
+	{
+		MovePacketSendTimer = MOVE_PACKET_SEND_DELAY;
+
+		Protocol::C_MOVE MovePkt;
+
+		{
+			auto tempInfo = MovePkt.mutable_info(); //수정가능한 info
+			tempInfo->CopyFrom(*PlayerInfo);
+		}
+
+		SEND_PACKET(MovePkt);
+	}
 
 }
 

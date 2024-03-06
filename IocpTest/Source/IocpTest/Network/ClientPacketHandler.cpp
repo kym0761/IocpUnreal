@@ -83,6 +83,17 @@ bool Handle_S_DESPAWN(PacketSessionRef& session, Protocol::S_DESPAWN& pkt)
 	return true;
 }
 
+bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt)
+{
+	if (UTestGameInstance* GameInstance
+		= Cast<UTestGameInstance>(GWorld->GetGameInstance()))
+	{
+		GameInstance->HandleMove(pkt);
+	}
+
+	return true;
+}
+
 bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt)
 {
 	////받은 메시지 보여줌

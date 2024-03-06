@@ -22,7 +22,7 @@ bool FRoom::HandleEnterPlayerLocked(PlayerRef player)
 	// 일단 임의의 위치에 배치할 계획
 	player->PlayerInfo->set_x(FServerUtils::GetRandom(0.f, 500.f));
 	player->PlayerInfo->set_y(FServerUtils::GetRandom(0.f, 500.f));
-	player->PlayerInfo->set_z(FServerUtils::GetRandom(0.f, 500.f));
+	player->PlayerInfo->set_z(100.0f);
 	player->PlayerInfo->set_yaw(FServerUtils::GetRandom(0.f, 100.f));
 
 
@@ -105,6 +105,40 @@ bool FRoom::HandleLeavePlayerLocked(PlayerRef player)
 	}
 
 	return success;
+}
+
+void FRoom::HandleMoveLocked(Protocol::C_MOVE& pkt)
+{
+	WRITE_LOCK;
+
+	//없는 플레이어를 이동시키려고 함
+	const uint64 objectId = pkt.info().object_id();
+	if (PlayersInRoom.find(objectId) == PlayersInRoom.end())
+	{
+		return;
+	}
+
+	//!! 있는 플레이어지만, 비정상적인 이동을 하려고 한다
+	//!! 아마도 해커거나 핵이나 아무튼 별로 좋은 일은 아니다.
+	//!! 그 부분에 대한 대비를 해야하지만 여기서는 스킵한다.
+
+	//이동한 플레이어의 정보 갱신
+	PlayerRef& player = PlayersInRoom[objectId];
+	player->PlayerInfo->CopyFrom(pkt.info());
+		
+	{
+		Protocol::S_MOVE movePkt;
+		{
+			Protocol::PlayerInfo* info = movePkt.mutable_info();
+			info->CopyFrom(pkt.info());
+		}
+
+		//직렬화 후 broadcast.
+		SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(movePkt);
+		Broadcast(sendBuffer);
+
+	}
+
 }
 
 bool FRoom::EnterPlayer(PlayerRef player)

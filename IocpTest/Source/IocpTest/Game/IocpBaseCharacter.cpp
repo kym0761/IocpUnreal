@@ -41,6 +41,13 @@ AIocpBaseCharacter::AIocpBaseCharacter()
 
 	//GetCharacterMovement()->bRunPhysicsWithNoController = true;
 
+	PlayerInfo = new Protocol::PlayerInfo();
+}
+
+AIocpBaseCharacter::~AIocpBaseCharacter()
+{
+	delete PlayerInfo;
+	PlayerInfo = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -55,5 +62,35 @@ void AIocpBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//캐릭터들의 정보(위치)값을 지속적으로 갱신함.
+	{
+		FVector Location = GetActorLocation();
+		PlayerInfo->set_x(Location.X);
+		PlayerInfo->set_y(Location.Y);
+		PlayerInfo->set_z(Location.Z);
+		PlayerInfo->set_yaw(GetControlRotation().Yaw);
+	}
+
+}
+
+bool AIocpBaseCharacter::IsMyCharacter()
+{
+	//myCharacter로 캐스팅해서 체크함.
+	return Cast<AIocpMyCharacter>(this) != nullptr;
+}
+
+void AIocpBaseCharacter::SetPlayerInfo(const Protocol::PlayerInfo& Info)
+{
+	if (PlayerInfo->object_id() != 0) //object id를 변경하려는 시도가 있으면 비정상적임
+	{
+		assert(PlayerInfo->object_id() == Info.object_id());
+	}
+
+	//@!#$
+	PlayerInfo->CopyFrom(Info);
+
+
+	FVector Location(Info.x(), Info.y(), Info.z());
+	SetActorLocation(Location);
 }
 

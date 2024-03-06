@@ -117,6 +117,10 @@ void UTestGameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool
 		{
 			return;
 		}
+
+		//spawn시 위치 세팅
+		iocpCharacter->SetPlayerInfo(PlayerInfo);
+
 		MyIocpCharacter = iocpCharacter;
 		Players.Add(PlayerInfo.object_id(), iocpCharacter);
 	}
@@ -124,6 +128,9 @@ void UTestGameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool
 	{
 		AActor* Actor = world->SpawnActor(OtherPlayerBP, &SpawnLocation);
 		AIocpBaseCharacter* iocpCharacter = Cast<AIocpBaseCharacter>(Actor);
+	
+		iocpCharacter->SetPlayerInfo(PlayerInfo);
+		
 		Players.Add(PlayerInfo.object_id(), iocpCharacter);
 	}
 
@@ -132,14 +139,14 @@ void UTestGameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool
 
 void UTestGameInstance::HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt)
 {
-	HandleSpawn(EnterGamePkt.player(), true);
+	HandleSpawn(EnterGamePkt.player(), true); //플레이어의 캐릭터
 }
 
 void UTestGameInstance::HandleSpawn(const Protocol::S_SPAWN& SpawnPkt)
 {
 	for (const Protocol::PlayerInfo& Player : SpawnPkt.players())
 	{
-		HandleSpawn(Player, false);
+		HandleSpawn(Player, false); // 다른 플레이어의 캐릭터
 	}
 }
 
@@ -165,4 +172,34 @@ void UTestGameInstance::HandleDespawn(const Protocol::S_DESPAWN& DespawnPkt)
 	{
 		HandleDespawn(ObjectId);
 	}
+}
+
+void UTestGameInstance::HandleMove(const Protocol::S_MOVE& MovePkt)
+{
+	if (Socket == nullptr || GameServerSession == nullptr)
+		return;
+
+	auto* World = GetWorld();
+	if (World == nullptr)
+		return;
+
+	const uint64 objectId = MovePkt.info().object_id();
+
+	AIocpBaseCharacter** foundActor = Players.Find(objectId);
+	if (foundActor == nullptr)
+		return;
+
+	AIocpBaseCharacter* Player = (*foundActor);
+	
+	//패킷을 계속 broadcast하기 때문에 과거의 나의 위치를 보내면
+	//서버가 그 패킷 정보로 다시 갱신되서 플레이어가 제자리 걸음을 함
+	//그 부분을 막기 위해서 S_Move 패킷은 클라이언트의 플레이어는 제외함.
+	if (Player->IsMyCharacter())
+		return;
+
+	const Protocol::PlayerInfo& Info = MovePkt.info();
+	Player->SetPlayerInfo(Info);
+	//Player->SetDestInfo(Info);
+
+
 }
