@@ -3,23 +3,26 @@
 #include "Job.h"
 #include "JobQueue.h"
 
-class FRoom : public enable_shared_from_this<FRoom>
+class FRoom : public FJobQueue
 {
 
 public:
 	FRoom();
 	virtual ~FRoom();
 
-	bool HandleEnterPlayerLocked(PlayerRef player);
-	bool HandleLeavePlayerLocked(PlayerRef player);
+	bool HandleEnterPlayer(PlayerRef player);
+	bool HandleLeavePlayer(PlayerRef player);
+	void HandleMove(Protocol::C_MOVE pkt);
 
-	void HandleMoveLocked(Protocol::C_MOVE& pkt);
+	RoomRef GetRoomRef();
 
 private:
 	bool EnterPlayer(PlayerRef player);
 	bool LeavePlayer(uint64 objectId);
 
-	USE_LOCK; //room에서 패킷을 처리할때마다 lock을 걸어야함.
+
+	//2안 : room에서 lock을 잡지 않는다.
+	//USE_LOCK; //1안 : room에서 패킷을 처리할때마다 lock을 걸어야함.
 
 private:
 	//exceptId = 제외해야할 id

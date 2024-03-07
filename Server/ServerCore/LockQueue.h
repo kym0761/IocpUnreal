@@ -12,21 +12,30 @@ public:
 		Items.push(item);
 	}
 
+	//기존 popall에서 pop을 할 떄 write_lock을 이미 하고 있어서
+	//이 lock을 쓰는 pop방식은 사용할 수 없음.
+	//T Pop()
+	//{
+	//	WRITE_LOCK;
+	//	if (Items.empty())
+	//		return T();
+
+	//	T ret = Items.front();
+	//	Items.pop();
+	//	return ret;
+	//}
+
 	T Pop()
 	{
 		WRITE_LOCK;
-		if (Items.empty())
-			return T();
 
-		T ret = Items.front();
-		Items.pop();
-		return ret;
+		return PopNoLock();
 	}
 
 	void PopAll(OUT vector<T>& items)
 	{
 		WRITE_LOCK;
-		while (T item = Pop())
+		while (T item = PopNoLock())
 			items.push_back(item);
 	}
 
@@ -34,6 +43,17 @@ public:
 	{
 		WRITE_LOCK;
 		Items = queue<T>();
+	}
+
+private:
+	T PopNoLock()
+	{
+		if (Items.empty())
+			return T();
+
+		T ret = Items.front();
+		Items.pop();
+		return ret;
 	}
 
 private:

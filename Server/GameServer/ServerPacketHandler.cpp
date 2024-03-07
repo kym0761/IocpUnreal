@@ -47,8 +47,11 @@ bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt)
 		FObjectUtils::CreatePlayer(
 			static_pointer_cast<FGameSession>(session));
 
-	// 방에 입장
-	GRoom->HandleEnterPlayerLocked(player);
+	// //방에 입장
+	//GRoom->HandleEnterPlayerLocked(player);
+
+	//플레이어가 방에 입장하는 것을 예약함.
+	GRoom->DoAsync(&FRoom::HandleEnterPlayer, player);
 
 	return true;
 }
@@ -65,9 +68,9 @@ bool Handle_C_LEAVE_GAME(PacketSessionRef& session, Protocol::C_LEAVE_GAME& pkt)
 	if (room == nullptr)
 		return false;
 
-	room->HandleLeavePlayerLocked(player);
+	//room->HandleLeavePlayerLocked(player);
 
-	cout << "player " << player->PlayerInfo->object_id() << " is leaved.." << endl;
+	GRoom->DoAsync(&FRoom::HandleLeavePlayer, player);
 
 	return true;
 }
@@ -86,7 +89,9 @@ bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt)
 
 	// TODO
 
-	room->HandleMoveLocked(pkt);
+	//room->HandleMoveLocked(pkt);
+
+	room->DoAsync(&FRoom::HandleMove, pkt);
 
 	return true;
 }

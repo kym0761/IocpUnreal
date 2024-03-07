@@ -13,9 +13,9 @@ FRoom::~FRoom()
 {
 }
 
-bool FRoom::HandleEnterPlayerLocked(PlayerRef player)
+bool FRoom::HandleEnterPlayer(PlayerRef player)
 {
-	WRITE_LOCK;
+	//WRITE_LOCK;
 
 	bool success = EnterPlayer(player);
 
@@ -72,12 +72,12 @@ bool FRoom::HandleEnterPlayerLocked(PlayerRef player)
 	return true;
 }
 
-bool FRoom::HandleLeavePlayerLocked(PlayerRef player)
+bool FRoom::HandleLeavePlayer(PlayerRef player)
 {
 	if (player == nullptr)
 		return false;
 
-	WRITE_LOCK;
+	//WRITE_LOCK;
 
 	const uint64 objectId = player->PlayerInfo->object_id();
 	bool success = LeavePlayer(objectId); //메모리 상에서는 여기서 사라짐.
@@ -104,12 +104,14 @@ bool FRoom::HandleLeavePlayerLocked(PlayerRef player)
 			session->Send(sendBuffer);
 	}
 
+	cout << "player " << player->PlayerInfo->object_id() << " is leaved.." << endl;
+
 	return success;
 }
 
-void FRoom::HandleMoveLocked(Protocol::C_MOVE& pkt)
+void FRoom::HandleMove(Protocol::C_MOVE pkt)
 {
-	WRITE_LOCK;
+	//WRITE_LOCK;
 
 	//없는 플레이어를 이동시키려고 함
 	const uint64 objectId = pkt.info().object_id();
@@ -141,6 +143,11 @@ void FRoom::HandleMoveLocked(Protocol::C_MOVE& pkt)
 
 }
 
+RoomRef FRoom::GetRoomRef()
+{
+	return  static_pointer_cast<FRoom>(shared_from_this());
+}
+
 bool FRoom::EnterPlayer(PlayerRef player)
 {
 	//handleEnter에서 lock을 걸었으므로, 여기서 걸면 안됨!
@@ -152,7 +159,7 @@ bool FRoom::EnterPlayer(PlayerRef player)
 	PlayersInRoom.insert(
 		make_pair(player->PlayerInfo->object_id(), player));
 
-	player->Room.store(shared_from_this());
+	player->Room.store(GetRoomRef());
 
 	return true;
 }
