@@ -40,8 +40,8 @@ AIocpBaseCharacter::AIocpBaseCharacter()
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
 
-	PlayerInfo = new Protocol::PlayerInfo();
-	DestInfo = new Protocol::PlayerInfo();
+	PlayerInfo = new Protocol::PosInfo();
+	DestInfo = new Protocol::PosInfo();
 
 	//aicontroller possess할 것이라 체크하지 않음.
 	// BP에서 세팅함
@@ -139,7 +139,7 @@ void AIocpBaseCharacter::SetMoveState(Protocol::MoveState State)
 	PlayerInfo->set_state(State);
 }
 
-void AIocpBaseCharacter::SetPlayerInfo(const Protocol::PlayerInfo& Info)
+void AIocpBaseCharacter::SetPlayerInfo(const Protocol::PosInfo& Info)
 {
 	if (PlayerInfo->object_id() != 0) //object id를 변경하려는 시도가 있으면 비정상적임
 	{
@@ -154,7 +154,7 @@ void AIocpBaseCharacter::SetPlayerInfo(const Protocol::PlayerInfo& Info)
 	SetActorLocation(Location);
 }
 
-void AIocpBaseCharacter::SetDestInfo(const Protocol::PlayerInfo& Info)
+void AIocpBaseCharacter::SetDestInfo(const Protocol::PosInfo& Info)
 {
 	if (PlayerInfo->object_id() != 0) //object id를 변경하려는 시도가 있으면 비정상적임
 	{

@@ -22,7 +22,7 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 	//예시 2
 	for (int32 i = 0; i < pkt.players_size(); i++)
 	{
-		const Protocol::PlayerInfo& Player = pkt.players(i);
+		const Protocol::ObjectInfo& Player = pkt.players(i);
 	}
 
 	// 로비에서 캐릭터 선택했다고 가정함.

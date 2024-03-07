@@ -20,8 +20,13 @@
 //USING_SHARED_PTR(FPlayer);
 //USING_SHARED_PTR(FRoom);
 using GameSessionRef = shared_ptr<class FGameSession>;
-using PlayerRef = shared_ptr<class FPlayer>;
 using RoomRef = shared_ptr<class FRoom>;
+using ObjectRef = shared_ptr<class FObject>;
+using MonsterRef = shared_ptr<class FMonster>;
+using CreatureRef = shared_ptr<class FCreature>;
+using PlayerRef = shared_ptr<class FPlayer>;
+
+
 
 #define SEND_PACKET(pkt)													\
 	SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(pkt);	\

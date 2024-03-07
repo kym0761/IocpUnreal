@@ -91,7 +91,7 @@ void UTestGameInstance::SendPacket(SendBufferRef SendBuffer)
 	GameServerSession->SendPacket(SendBuffer);
 }
 
-void UTestGameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool bIsMyPlayer)
+void UTestGameInstance::HandleSpawn(const Protocol::ObjectInfo& ObjectInfo, bool bIsMyPlayer)
 {
 	if (Socket == nullptr || GameServerSession == nullptr)
 		return;
@@ -101,13 +101,13 @@ void UTestGameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool
 		return;
 
 	// 중복 처리 체크
-	const uint64 objectId = PlayerInfo.object_id();
+	const uint64 objectId = ObjectInfo.object_id();
 	if (Players.Find(objectId) != nullptr)
 	{
 		return; //중복이 왜 있는지는 모르지만 끝낸다.
 	}
 	
-	FVector SpawnLocation(PlayerInfo.x(), PlayerInfo.y(), PlayerInfo.z());
+	FVector SpawnLocation(ObjectInfo.pos_info().x(), ObjectInfo.pos_info().y(), ObjectInfo.pos_info().z());
 
 	if (bIsMyPlayer)
 	{
@@ -119,19 +119,19 @@ void UTestGameInstance::HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool
 		}
 
 		//spawn시 위치 세팅
-		iocpCharacter->SetPlayerInfo(PlayerInfo);
+		iocpCharacter->SetPlayerInfo(ObjectInfo.pos_info());
 
 		MyIocpCharacter = iocpCharacter;
-		Players.Add(PlayerInfo.object_id(), iocpCharacter);
+		Players.Add(ObjectInfo.object_id(), iocpCharacter);
 	}
 	else
 	{
 		AActor* Actor = world->SpawnActor(OtherPlayerBP, &SpawnLocation);
 		AIocpBaseCharacter* iocpCharacter = Cast<AIocpBaseCharacter>(Actor);
 	
-		iocpCharacter->SetPlayerInfo(PlayerInfo);
+		iocpCharacter->SetPlayerInfo(ObjectInfo.pos_info());
 		
-		Players.Add(PlayerInfo.object_id(), iocpCharacter);
+		Players.Add(ObjectInfo.object_id(), iocpCharacter);
 	}
 
 
@@ -144,7 +144,7 @@ void UTestGameInstance::HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt)
 
 void UTestGameInstance::HandleSpawn(const Protocol::S_SPAWN& SpawnPkt)
 {
-	for (const Protocol::PlayerInfo& Player : SpawnPkt.players())
+	for (const Protocol::ObjectInfo& Player : SpawnPkt.players())
 	{
 		HandleSpawn(Player, false); // 다른 플레이어의 캐릭터
 	}
@@ -197,7 +197,7 @@ void UTestGameInstance::HandleMove(const Protocol::S_MOVE& MovePkt)
 	if (Player->IsMyCharacter())
 		return;
 
-	const Protocol::PlayerInfo& Info = MovePkt.info();
+	const Protocol::PosInfo& Info = MovePkt.info();
 	
 	//목적지로 보정 이동하는 로직을 실행
 	//Player->SetPlayerInfo(Info);

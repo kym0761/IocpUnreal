@@ -83,6 +83,9 @@ int main()
 	//Main Thread도 따로 실행
 	//DoWorkerJob(service);
 
+	//room의 updatetick 최초 실행
+	GRoom->DoAsync(&FRoom::UpdateTick);
+
 	while (true)
 	{
 		//Protocol::S_CHAT pkt;

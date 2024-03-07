@@ -29,11 +29,11 @@ public:
 	void SetMoveState(Protocol::MoveState State);
 
 public:
-	void SetPlayerInfo(const Protocol::PlayerInfo& Info);
-	void SetDestInfo(const Protocol::PlayerInfo& Info);
-	Protocol::PlayerInfo* GetPlayerInfo() { return PlayerInfo; }
+	void SetPlayerInfo(const Protocol::PosInfo& Info);
+	void SetDestInfo(const Protocol::PosInfo& Info);
+	Protocol::PosInfo* GetPlayerInfo() { return PlayerInfo; }
 
 protected:
-	class Protocol::PlayerInfo* PlayerInfo; // 현재 위치
-	class Protocol::PlayerInfo* DestInfo; // 다른 플레이어들의 목적지 위치
+	class Protocol::PosInfo* PlayerInfo; // 현재 위치
+	class Protocol::PosInfo* DestInfo; // 다른 플레이어들의 목적지 위치
 };

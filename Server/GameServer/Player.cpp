@@ -3,10 +3,11 @@
 
 FPlayer::FPlayer()
 {
-	PlayerInfo = new Protocol::PlayerInfo();
+	bIsPlayer = true;
+
 }
 
 FPlayer::~FPlayer()
 {
-	delete PlayerInfo;
+
 }

@@ -1,19 +1,15 @@
 #pragma once
-
+#include "Creature.h"
 class FGameSession;
 class FRoom;
 
-class FPlayer : public enable_shared_from_this<FPlayer>
+class FPlayer : public FCreature
 {
 public:
 	FPlayer();
 	virtual ~FPlayer();
 
 public:
-	Protocol::PlayerInfo* PlayerInfo;
 	weak_ptr<FGameSession> Session;
-
-public:
-	atomic<weak_ptr<FRoom>> Room;
 };
 

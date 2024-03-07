@@ -85,7 +85,7 @@ void AIocpMyCharacter::Tick(float DeltaTime)
 		Protocol::C_MOVE MovePkt;
 
 		{
-			auto mutable_Info = MovePkt.mutable_info(); //수정가능한 info
+			Protocol::PosInfo* mutable_Info = MovePkt.mutable_info(); //수정가능한 info
 			mutable_Info->CopyFrom(*PlayerInfo); //먼저, 데이터는 그대로 복사
 
 			//state

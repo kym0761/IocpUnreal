@@ -12,7 +12,8 @@ PlayerRef FObjectUtils::CreatePlayer(GameSessionRef session)
 	const int64 newId = S_IdGenerator.fetch_add(1);
 
 	PlayerRef player = make_shared<FPlayer>();
-	player->PlayerInfo->set_object_id(newId);
+	player->ObjectInfo->set_object_id(newId);
+	player->PosInfo->set_object_id(newId);
 
 	player->Session = session;
 	session->Player.store(player);

@@ -27,11 +27,14 @@ bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt)
 	//플레이어의 캐릭터가 3개가 있을 것이라고 가정함.
 	for (int32 i = 0; i < 3; i++)
 	{
-		Protocol::PlayerInfo* player = loginPkt.add_players();
-		player->set_x(FServerUtils::GetRandom(0.f, 100.f));
-		player->set_y(FServerUtils::GetRandom(0.f, 100.f));
-		player->set_z(FServerUtils::GetRandom(0.f, 100.f));
-		player->set_yaw(FServerUtils::GetRandom(0.f, 45.f));
+		Protocol::ObjectInfo* player = loginPkt.add_players();
+
+		Protocol::PosInfo* posInfo = player->mutable_pos_info();
+
+		posInfo->set_x(FServerUtils::GetRandom(0.f, 100.f));
+		posInfo->set_y(FServerUtils::GetRandom(0.f, 100.f));
+		posInfo->set_z(FServerUtils::GetRandom(0.f, 100.f));
+		posInfo->set_yaw(FServerUtils::GetRandom(0.f, 45.f));
 	}
 
 	loginPkt.set_success(true);

@@ -36,7 +36,7 @@ public:
 	void SendPacket(SendBufferRef SendBuffer);
 
 public:
-	void HandleSpawn(const Protocol::PlayerInfo& PlayerInfo, bool bIsMyPlayer);
+	void HandleSpawn(const Protocol::ObjectInfo& ObjectInfo, bool bIsMyPlayer);
 	void HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt);
 	void HandleSpawn(const Protocol::S_SPAWN& SpawnPkt);
 
