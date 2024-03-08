@@ -102,8 +102,6 @@ bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt)
 
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 {
-	cout << pkt.msg() << endl;
-
 	auto gameSession = static_pointer_cast<FGameSession>(session);
 
 	PlayerRef player = gameSession->Player.load();
@@ -111,7 +109,17 @@ bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 	{
 		return false;
 	}
-		
+
+	string s = pkt.msg();
+
+	//utf-8 -> utf-16
+	int nLen = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.size(), NULL, NULL);
+	wstring ws(nLen, 0); 
+	MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.size(), ws.data(), nLen);
+
+	wcout.imbue(locale("kor"));
+	wcout << ws << endl;
+
 	GRoom->DoAsync(&FRoom::HandleChatFromPlayer, player, pkt);
 
 	return true;

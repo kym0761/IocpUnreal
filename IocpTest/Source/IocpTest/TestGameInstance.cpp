@@ -72,14 +72,6 @@ void UTestGameInstance::DisconnectFromGameServer()
 
 	Protocol::C_LEAVE_GAME LeavePkt;
 	SEND_PACKET(LeavePkt);
-
-	//if (Socket)
-	//{
-	//	ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get();
-	//	SocketSubsystem->DestroySocket(Socket);
-	//	Socket = nullptr;
-	//}
-
 }
 
 void UTestGameInstance::HandleRecvPackets()
@@ -239,7 +231,7 @@ void UTestGameInstance::HandleChat(const Protocol::S_CHAT& ChatPkt)
 	}
 
 	auto msg = ChatPkt.msg();
-	FString str = *FString(msg.c_str());
+	FString str = *FString(UTF8_TO_TCHAR(msg.c_str()));
 
 	auto chatSlot = CreateWidget<UChatSlotWidget>(this, ChatSlotBP);
 	chatSlot->TextBlock_Chat->SetText(FText::FromString(str));

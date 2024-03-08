@@ -29,11 +29,13 @@ enum : uint16
 
 
 // Custom Handlers
-//이 함수 구현은 사용자가 직접 만들어야 함.
-// 이유? 자동화 시스템은 이 함수가 어떤 기능을 할지 알 수 없다..
+
+//INVALID는 실제론 사용되지 않을 임시 함수임.
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len);
 
 //선언만 자동화
+//이 함수 구현은 사용자가 직접 만들어야 함.
+// 이유? 자동화 시스템은 이 함수가 어떤 기능을 할지 알 수 없다..
 bool Handle_C_LOGIN(PacketSessionRef& session, Protocol::C_LOGIN& pkt);
 bool Handle_C_ENTER_GAME(PacketSessionRef& session, Protocol::C_ENTER_GAME& pkt);
 bool Handle_C_LEAVE_GAME(PacketSessionRef& session, Protocol::C_LEAVE_GAME& pkt);
@@ -53,7 +55,7 @@ public:
 			GPacketHandler[i] = Handle_INVALID; //함수에 일단 HANDLE INVALID를 등록
 		}
 
-		//패킷이 늘어날 떄마다 추가하는 자동화 필요.
+		//패킷이 늘어날 때마다 추가하는 자동화 위치.
 		//PKT_S_TEST에 대한 함수 등록
 		GPacketHandler[PKT_C_LOGIN] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_LOGIN>(Handle_C_LOGIN, session, buffer, len); };
 		GPacketHandler[PKT_C_ENTER_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::C_ENTER_GAME>(Handle_C_ENTER_GAME, session, buffer, len); };

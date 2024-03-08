@@ -17,13 +17,14 @@ void UUserChatWidget::OnTextEntered(const FText& Text, ETextCommit::Type CommitM
 {
 	if (CommitMethod == ETextCommit::OnEnter)
 	{
+
 		FString fstr = Text.ToString();
 		std::string str = TCHAR_TO_UTF8(*fstr);
 
 		Protocol::C_CHAT chatPkt;
 		
 		{
-			std::string* msg = chatPkt.mutable_msg();
+			auto msg = chatPkt.mutable_msg();
 			*msg = str;
 		}
 

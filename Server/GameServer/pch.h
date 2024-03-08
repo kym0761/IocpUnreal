@@ -26,8 +26,7 @@ using MonsterRef = shared_ptr<class FMonster>;
 using CreatureRef = shared_ptr<class FCreature>;
 using PlayerRef = shared_ptr<class FPlayer>;
 
-
-
 #define SEND_PACKET(pkt)													\
 	SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(pkt);	\
-	session->Send(sendBuffer);	\
+	session->Send(sendBuffer);
+

@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 
-
+//struct FPacketHeader
+//{
+//	uint16 size;
+//	uint16 id; // 프로토콜ID (ex. 1=로그인, 2=이동요청)
+//};
 
 struct IOCPTEST_API FPacketHeader
 {
@@ -24,16 +28,11 @@ struct IOCPTEST_API FPacketHeader
 		return Ar;
 	}
 
-	/*순서 중요함*/
+	//순서가 중요함
+	//처음 size를 읽고 나서야 id와 그 후 데이터를 얼마나 읽어야 하는지 알 수 있음.
 	uint16 size;
 	uint16 id;
 };
-
-//struct FPacketHeader
-//{
-//	uint16 size;
-//	uint16 id; // 프로토콜ID (ex. 1=로그인, 2=이동요청)
-//};
 
 class FSendBuffer : public TSharedFromThis<FSendBuffer>
 {
@@ -59,7 +58,6 @@ private:
 USING_SHARED_PTR(Session); // SessionRef = TSharedPTr<FSession>;
 USING_SHARED_PTR(PacketSession);
 USING_SHARED_PTR(SendBuffer);
-
 
 #include "ClientPacketHandler.h"
 #include "TestGameInstance.h"
