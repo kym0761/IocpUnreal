@@ -11,6 +11,13 @@
 #include "ClientPacketHandler.h"
 #include "IocpBaseCharacter.h"
 
+#include "Blueprint/UserWidget.h"
+#include "ChatSlotWidget.h"
+#include "UserChatWidget.h"
+#include "Components/TextBlock.h"
+#include "Components/ScrollBox.h"
+
+
 void UTestGameInstance::ConnectToGameServer()
 {
 	Socket = ISocketSubsystem::Get(
@@ -81,6 +88,19 @@ void UTestGameInstance::HandleRecvPackets()
 		return;
 
 	GameServerSession->HandleRecvPackets();
+}
+
+void UTestGameInstance::AddUserChatWidget()
+{
+	if (!IsValid(UserChatBP))
+	{
+		return;
+	}
+
+	UserChatWidget
+	= CreateWidget<UUserChatWidget>(this, UserChatBP);
+
+	UserChatWidget->AddToViewport();
 }
 
 void UTestGameInstance::SendPacket(SendBufferRef SendBuffer)
@@ -203,5 +223,27 @@ void UTestGameInstance::HandleMove(const Protocol::S_MOVE& MovePkt)
 	//Player->SetPlayerInfo(Info);
 	Player->SetDestInfo(Info);
 
+
+}
+
+void UTestGameInstance::HandleChat(const Protocol::S_CHAT& ChatPkt)
+{
+	if (!IsValid(UserChatWidget))
+	{
+		return;
+	}
+
+	if (!IsValid(ChatSlotBP))
+	{
+		return;
+	}
+
+	auto msg = ChatPkt.msg();
+	FString str = *FString(msg.c_str());
+
+	auto chatSlot = CreateWidget<UChatSlotWidget>(this, ChatSlotBP);
+	chatSlot->TextBlock_Chat->SetText(FText::FromString(str));
+
+	UserChatWidget->ScrollBox_ChatScroll->AddChild(chatSlot);
 
 }

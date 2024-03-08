@@ -103,15 +103,16 @@ bool Handle_C_MOVE(PacketSessionRef& session, Protocol::C_MOVE& pkt)
 bool Handle_C_CHAT(PacketSessionRef& session, Protocol::C_CHAT& pkt)
 {
 	cout << pkt.msg() << endl;
-	//cout << "received c_chat" << endl;
 
-	////모든 클라이언트에게 전달.
-	//Protocol::S_CHAT chatPkt;
-	////chatPkt.set_msg(pkt.msg());
-	//chatPkt.set_msg(u8"broadcasted msg.. Hello World!");
-	//auto sendBuffer = FServerPacketHandler::MakeSendBuffer(chatPkt);
+	auto gameSession = static_pointer_cast<FGameSession>(session);
 
-	//GRoom->DoAsync(&FRoom::Broadcast, sendBuffer);
+	PlayerRef player = gameSession->Player.load();
+	if (player == nullptr)
+	{
+		return false;
+	}
+		
+	GRoom->DoAsync(&FRoom::HandleChatFromPlayer, player, pkt);
 
 	return true;
 }

@@ -9,6 +9,9 @@
 
 class FPacketSession;
 class AIocpBaseCharacter;
+
+class UChatSlotWidget;
+class UUserChatWidget;
 /**
  * 
  */
@@ -33,6 +36,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void HandleRecvPackets();
 
+
+	UFUNCTION(BlueprintCallable)
+	void AddUserChatWidget();
+
 	void SendPacket(SendBufferRef SendBuffer);
 
 public:
@@ -44,6 +51,7 @@ public:
 	void HandleDespawn(const Protocol::S_DESPAWN& DespawnPkt);
 
 	void HandleMove(const Protocol::S_MOVE& MovePkt);
+	void HandleChat(const Protocol::S_CHAT& ChatPkt);
 
 public:
 
@@ -60,4 +68,11 @@ public:
 	AIocpBaseCharacter* MyIocpCharacter;
 	TMap<uint64, AIocpBaseCharacter*> Players;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UChatSlotWidget> ChatSlotBP;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserChatWidget> UserChatBP;
+
+	UPROPERTY()
+	UUserChatWidget* UserChatWidget;
 };

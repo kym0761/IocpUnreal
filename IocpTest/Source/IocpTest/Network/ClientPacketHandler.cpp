@@ -96,10 +96,11 @@ bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt)
 
 bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt)
 {
-	////받은 메시지 보여줌
-	//std::cout << pkt.msg() << endl;
-
-	auto Msg = pkt.msg();
+	if (UTestGameInstance* GameInstance
+		= Cast<UTestGameInstance>(GWorld->GetGameInstance()))
+	{
+		GameInstance->HandleChat(pkt);
+	}
 
 	return true;
 

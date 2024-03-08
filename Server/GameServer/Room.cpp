@@ -168,15 +168,35 @@ void FRoom::HandleMove(Protocol::C_MOVE pkt)
 
 }
 
-void FRoom::UpdateTick()
+void FRoom::HandleChat(Protocol::C_CHAT pkt)
+{
+}
+
+void FRoom::HandleChatFromPlayer(PlayerRef player, Protocol::C_CHAT pkt)
 {
 
-	cout << "Update Room" << endl;
+	string str = pkt.msg();
 
+	uint64 id = player->ObjectInfo->object_id();
+
+	Protocol::S_CHAT sendChatPkt;
+
+	{
+		string* ms = sendChatPkt.mutable_msg();
+		*ms = to_string(id) + " Player : " + str;
+		sendChatPkt.set_playerid(id);
+	}
+
+	SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(sendChatPkt);
+	Broadcast(sendBuffer);
+}
+
+void FRoom::UpdateTick()
+{
+	//cout << "Update Room" << endl;
 
 	//100ms마다 (0.1초) updatetick을 재실행
 	DoTimer(100, &FRoom::UpdateTick);
-
 }
 
 RoomRef FRoom::GetRoomRef()

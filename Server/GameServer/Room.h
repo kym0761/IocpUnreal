@@ -18,6 +18,9 @@ public:
 	bool HandleLeavePlayer(PlayerRef player);
 	void HandleMove(Protocol::C_MOVE pkt);
 
+	void HandleChat(Protocol::C_CHAT pkt);
+	void HandleChatFromPlayer(PlayerRef player, Protocol::C_CHAT pkt);
+
 public:
 	void UpdateTick();
 

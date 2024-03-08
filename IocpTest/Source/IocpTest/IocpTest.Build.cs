@@ -9,7 +9,7 @@ public class IocpTest : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 		PublicDependencyModuleNames.AddRange(
-            new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking" ,"EnhancedInput" });
+            new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking" ,"EnhancedInput" , "UMG" });
 
         PrivateDependencyModuleNames.AddRange(new string[] { "ProtobufCore" });
 
@@ -21,7 +21,7 @@ public class IocpTest : ModuleRules
         });
 
         // Uncomment if you are using Slate UI
-        // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
         // Uncomment if you are using online features
         // PrivateDependencyModuleNames.Add("OnlineSubsystem");
