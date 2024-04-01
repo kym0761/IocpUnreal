@@ -5,10 +5,9 @@
 class FGameSession : public FPacketSession
 {
 public:
-	~FGameSession()
-	{
-		cout << "~FGameSession" << endl;
-	}
+
+	FGameSession();
+	~FGameSession();
 
 
 	virtual void OnConnected() override;

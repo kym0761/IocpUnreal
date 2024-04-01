@@ -16,9 +16,10 @@ FBufferReader::~FBufferReader()
 
 bool FBufferReader::Peek(void* dest, uint32 len)
 {
-	
 	if (GetFreeSize() < len)
+	{
 		return false;
+	}
 
 	::memcpy(dest, &Buffer[Pos], len);
 	return true;
@@ -27,7 +28,9 @@ bool FBufferReader::Peek(void* dest, uint32 len)
 bool FBufferReader::Read(void* dest, uint32 len)
 {
 	if (Peek(dest, len) == false)
+	{
 		return false;
+	}
 
 	Pos += len;
 	return true;

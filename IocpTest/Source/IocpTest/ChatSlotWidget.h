@@ -16,9 +16,13 @@ class IOCPTEST_API UChatSlotWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
-public:
+protected:
 
 	UPROPERTY(Meta = (BindWidget))
 	UTextBlock* TextBlock_Chat;
+
+public:
+
+	void SetChatText(FString Str);
 
 };

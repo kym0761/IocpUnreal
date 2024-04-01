@@ -40,6 +40,7 @@ struct FMemoryHeader : public SLIST_ENTRY //lockfreestack 기반으로 동작 �
 //메모리 할당은 커널 모드 전환하여 요청하기 때문에 오버헤드가 발생할 가능성이 있음
 //할당 해제할 메모리를 할당 해제하지 않고 따로 보관하여 필요할 때 다시 사용함
 //요즘 서버에서 굳이 사용하지는 않는다고는 함.
+//이유는 C++ new 의 성능이 과거에 비해 매우 좋아졌다고 함.
 
 DECLSPEC_ALIGN(SLIST_ALIGNMENT)
 class FMemoryPool

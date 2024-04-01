@@ -15,7 +15,9 @@ void FJobTimer::Distribute(uint64 now)
 {
 	// 한 번에 1 쓰레드만 통과
 	if (bDistributing.exchange(true) == true)
+	{
 		return;
+	}
 
 	vector<TimerItem> timerItems;
 

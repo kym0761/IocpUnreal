@@ -66,9 +66,6 @@
     <ClCompile Include="ObjectPool.cpp">
       <Filter>Memory/NotUse</Filter>
     </ClCompile>
-    <ClCompile Include="SocketUtils.cpp">
-      <Filter>Network</Filter>
-    </ClCompile>
     <ClCompile Include="NetAddress.cpp">
       <Filter>Network</Filter>
     </ClCompile>
@@ -143,6 +140,9 @@
     </ClCompile>
     <ClCompile Include="FileUtils.cpp">
       <Filter>Utils\NotUse</Filter>
+    </ClCompile>
+    <ClCompile Include="SocketUtils.cpp">
+      <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

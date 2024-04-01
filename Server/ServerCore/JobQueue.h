@@ -49,10 +49,12 @@ public:
 
 public:
 
-	void Push(JobRef job, bool bPushOnly = false);
+	void Push(JobRef job, bool bPushOnly = false); //bPushOnly면 이 쓰레드는 Job처리를 하지 않을 것.
 	void Execute();
 
 protected:
+
+	//LockQueue
 	FLockQueue<JobRef> Jobs;
 	Atomic<int32> JobCount = 0;
 };

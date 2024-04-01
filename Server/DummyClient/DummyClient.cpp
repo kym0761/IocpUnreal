@@ -8,6 +8,10 @@
 #include "BufferReader.h"
 #include "ClientPacketHandler.h"
 
+	/* 사용하지 않음 */
+	//언리얼 엔진이 클라이언트를 대체할 것.
+	//만일 활성화하고 싶다면 build->config manager에서 dummyclient 빌드 체크
+
 char sendData[] = "Hello World";
 
 class FServerSession : public FPacketSession
@@ -23,7 +27,7 @@ public:
 		//cout << "Connected To Server" << endl;
 
 		//일단 로그인
-		Protocol::C_LOGIN pkt;
+		Protocol::C2S_LOGIN pkt;
 		auto sendBuffer = FClientPacketHandler::MakeSendBuffer(pkt);
 		Send(sendBuffer);
 	}
@@ -50,8 +54,6 @@ public:
 
 int main()
 {
-	/* 사용하지 않음 */
-	//언리얼 엔진이 클라이언트를 대체할 것.
 
 	FClientPacketHandler::Init();
 
@@ -76,7 +78,7 @@ int main()
 			});
 	}
 
-	Protocol::C_CHAT chatPkt;
+	Protocol::C2S_CHAT chatPkt;
 	chatPkt.set_msg(u8"Client's Hello World !");
 	auto sendBuffer = FClientPacketHandler::MakeSendBuffer(chatPkt);
 

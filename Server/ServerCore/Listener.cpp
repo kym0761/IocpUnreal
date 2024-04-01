@@ -26,13 +26,16 @@ bool FListener::StartAccept(ServerServiceRef service)
 		return false;
 	}
 
+	//기존 소켓 생성 및 사용할 때는 논블로킹 세팅을 해줘야하지만
+	//WASSend, WASRecv 등의 함수를 사용하는 이상 비동기 논블로킹으로 사용될 것이므로
+	//ioctl()을 사용하여 논블로킹 세팅하지 않는 것으로 보임.
 	Socket = FSocketUtils::CreateSocket();
 	if (Socket == INVALID_SOCKET)
 	{
 		return false;
 	}
 
-	//accept할 이 Listener를 IOCP에 등록한다.
+	//accept할 이 Listener의 소켓을 IOCP에 등록한다.
 	if (Service->GetIocpCore()->Register(shared_from_this()) == false)
 	{
 		return false;
@@ -95,7 +98,8 @@ void FListener::Dispatch(FIocpEvent* iocpEvent, int32 numOfBytes)
 
 void FListener::RegisterAccept(FAcceptEvent* acceptEvent)
 {
-	SessionRef session = Service->CreateSession(); // Register IOCP
+	// 세션 생성 및 Register IOCP
+	SessionRef session = Service->CreateSession();
 
 	acceptEvent->Init();
 	acceptEvent->SetSession(session);

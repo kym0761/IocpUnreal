@@ -39,8 +39,10 @@ bool FRecvBuffer::OnRead(int32 numOfBytes)
 {
 	//얻어올 데이터가 데이터 사이즈보다 크면 X 
 	if (numOfBytes > GetDataSize())
+	{
 		return false;
-
+	}
+	
 
 	//ReadPos ++
 	ReadPos += numOfBytes;
@@ -51,7 +53,9 @@ bool FRecvBuffer::OnWrite(int32 numOfBytes)
 {
 	//여유 공간보다 써야할 데이터가 크면 X
 	if (numOfBytes > GetFreeSize())
+	{
 		return false;
+	}
 
 	//WritePos ++
 	WritePos += numOfBytes;

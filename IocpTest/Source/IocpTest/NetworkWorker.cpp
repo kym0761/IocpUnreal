@@ -31,7 +31,7 @@ uint32 FRecvWorker::Run()
 	{
 		TArray<uint8> Packet;
 
-		if (TryReceivePacket(OUT Packet))
+		if (ReceivePacket(OUT Packet))
 		{
 			//Tshared로 변환하면서, 세션은 사용하는 동안은 절대 레퍼런스 해제가 되지 않을 것이다.
 			if (TSharedPtr<FPacketSession> session = WeakSessionRef.Pin())
@@ -53,7 +53,7 @@ void FRecvWorker::Destroy()
 	bRunning = false;
 }
 
-bool FRecvWorker::TryReceivePacket(TArray<uint8>& OutPacket)
+bool FRecvWorker::ReceivePacket(TArray<uint8>& OutPacket)
 {
 	// 패킷 헤더 파싱
 	const int32 headerSize = sizeof(FPacketHeader);

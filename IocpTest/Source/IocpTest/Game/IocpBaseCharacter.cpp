@@ -64,6 +64,17 @@ void AIocpBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	//if (PlayerInfo == nullptr)
+	//{
+	//	PlayerInfo = new Protocol::PosInfo();
+	//}
+	//
+	//if (DestInfo == nullptr)
+	//{
+	//	DestInfo = new Protocol::PosInfo();
+	//}
+	
+
 	{
 		FVector Location = GetActorLocation();
 		DestInfo->set_x(Location.X);
@@ -92,21 +103,7 @@ void AIocpBaseCharacter::Tick(float DeltaTime)
 
 	if (!IsMyCharacter())
 	{
-		/*이 방식은 애니메이션 처리가 되지 않음*/
-
-		//FVector Location = GetActorLocation();
-		//FVector DestLocation = FVector(DestInfo->x(), DestInfo->y(), DestInfo->z());
-
-		//FVector MoveDir = (DestLocation - Location);
-		//const float DistToDest = MoveDir.Length(); //최종 목적지 거리
-		//MoveDir.Normalize();
-
-		//float MoveDist = (MoveDir * 600.f * DeltaTime).Length();
-		//MoveDist = FMath::Min(MoveDist, DistToDest); //목적지와 너무 가까울 때 더 멀리가게 되는 부분을 방지
-		//FVector NextLocation = Location + MoveDir * MoveDist;
-
-		//SetActorLocation(NextLocation);
-
+		
 		const Protocol::MoveState state = PlayerInfo->state();
 
 		if (state == Protocol::MOVE_STATE_RUN)
@@ -141,6 +138,12 @@ void AIocpBaseCharacter::SetMoveState(Protocol::MoveState State)
 
 void AIocpBaseCharacter::SetPlayerInfo(const Protocol::PosInfo& Info)
 {
+	//if (PlayerInfo == nullptr)
+	//{
+	//	return;
+	//}
+
+
 	if (PlayerInfo->object_id() != 0) //object id를 변경하려는 시도가 있으면 비정상적임
 	{
 		assert(PlayerInfo->object_id() == Info.object_id());
@@ -151,11 +154,18 @@ void AIocpBaseCharacter::SetPlayerInfo(const Protocol::PosInfo& Info)
 
 
 	FVector Location(Info.x(), Info.y(), Info.z());
+	FRotator rotation(0.0f, PlayerInfo->yaw(), 0.0f);
 	SetActorLocation(Location);
+	SetActorRotation(rotation);
 }
 
 void AIocpBaseCharacter::SetDestInfo(const Protocol::PosInfo& Info)
 {
+	//if (PlayerInfo == nullptr || DestInfo == nullptr)
+	//{
+	//	return;
+	//}
+	
 	if (PlayerInfo->object_id() != 0) //object id를 변경하려는 시도가 있으면 비정상적임
 	{
 		assert(PlayerInfo->object_id() == Info.object_id());

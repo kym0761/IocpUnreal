@@ -29,7 +29,6 @@ public:
 public:
 
 	/* 외부에서 사용 */
-	//void				Send(BYTE* buffer, int32 len);
 	void				Send(SendBufferRef sendBuffer);
 	bool				Connect();
 	void				Disconnect(const WCHAR* cause);
@@ -73,18 +72,22 @@ protected:
 	virtual void		OnDisconnected() { }
 
 private:
-	weak_ptr<FService>	Service;	// 서비스는 서버가 켜져있는 이상 어딘가에 존재하게 될 것이므로 굳이 shared_ptr로 레퍼런스 카운팅은 하지 않음.
+
+	// 서비스는 서버가 켜져있는 이상 어딘가에 존재하게 될 것이므로 
+	// 굳이 shared_ptr로 레퍼런스 카운팅은 하지 않음.
+	weak_ptr<FService>	Service;
+
 	SOCKET			Socket = INVALID_SOCKET; //클라이언트 소켓
 	FNetAddress		NetAddress = {};
 	Atomic<bool>	bConnected = false;
 
 private:
-	USE_LOCK;
 
 	/* 수신 관련 */
 	FRecvBuffer			RecvBuffer;
 
 	/* 송신 관련 */
+	USE_LOCK; // Send & ProcessSend에서 사용함
 	queue<SendBufferRef>	SendQueue;
 	Atomic<bool>			bSendRegistered = false;
 
@@ -100,6 +103,9 @@ private:
 	PacketSession
 ------------------*/
 
+//패킷 헤더
+//데이터를 읽기 위해서 최소한 이 헤더의 크기만큼의 데이터는 받아야함.
+//OnRecv 참고
 struct FPacketHeader
 {
 	uint16 size;
@@ -115,6 +121,6 @@ public:
 	PacketSessionRef	GetPacketSessionRef() { return static_pointer_cast<FPacketSession>(shared_from_this()); }
 
 protected:
-	virtual int32		OnRecv(BYTE* buffer, int32 len) sealed; //사용자가 더이상 건드리지 않음
+	virtual int32		OnRecv(BYTE* buffer, int32 len) sealed; //사용자가 더이상 override하지 않음.
 	virtual void		OnRecvPacket(BYTE* buffer, int32 len) abstract; //사용자는 여기 부분을 건드려야함.
 };

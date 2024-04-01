@@ -2,7 +2,19 @@
 #include "GameSession.h"
 #include "GameSessionManager.h"
 #include "ServerPacketHandler.h"
-//#include "Room.h"
+
+#include "Room.h"
+#include "Player.h"
+
+FGameSession::FGameSession()
+{
+	//cout << "FGameSession()" << endl;
+}
+
+FGameSession::~FGameSession()
+{
+	cout << "~FGameSession" << endl;
+}
 
 void FGameSession::OnConnected()
 {
@@ -14,7 +26,6 @@ void FGameSession::OnDisconnected()
 {
 	GSessionManager.Remove(
 		static_pointer_cast<FGameSession>(shared_from_this()));
-
 }
 
 void FGameSession::OnRecvPacket(BYTE* buffer, int32 len)

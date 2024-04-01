@@ -10,7 +10,6 @@
 class FPacketSession;
 class AIocpBaseCharacter;
 
-class UChatSlotWidget;
 class UUserChatWidget;
 /**
  * 
@@ -36,7 +35,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void HandleRecvPackets();
 
-
+	//플레이어 캐릭터에 의해 Chat UI 생성
 	UFUNCTION(BlueprintCallable)
 	void AddUserChatWidget();
 
@@ -44,15 +43,15 @@ public:
 
 public:
 	void HandleSpawn(const Protocol::ObjectInfo& ObjectInfo, bool bIsMyPlayer);
-	void HandleSpawn(const Protocol::S_ENTER_GAME& EnterGamePkt);
-	void HandleSpawn(const Protocol::S_SPAWN& SpawnPkt);
+	void HandleSpawn(const Protocol::S2C_ENTER_GAME& EnterGamePkt);
+	void HandleSpawn(const Protocol::S2C_SPAWN& SpawnPkt);
 
 	void HandleDespawn(uint64 ObjectId);
-	void HandleDespawn(const Protocol::S_DESPAWN& DespawnPkt);
+	void HandleDespawn(const Protocol::S2C_DESPAWN& DespawnPkt);
 
-	void HandleMove(const Protocol::S_MOVE& MovePkt);
-	void HandleChat(const Protocol::S_CHAT& ChatPkt);
-
+	void HandleMove(const Protocol::S2C_MOVE& MovePkt);
+	void HandleChat(const Protocol::S2C_CHAT& ChatPkt);
+	void HandleJump(const Protocol::S2C_JUMP& JumpPkt);
 public:
 
 	// GameServer
@@ -68,8 +67,6 @@ public:
 	AIocpBaseCharacter* MyIocpCharacter;
 	TMap<uint64, AIocpBaseCharacter*> Players;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UChatSlotWidget> ChatSlotBP;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserChatWidget> UserChatBP;
 

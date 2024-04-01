@@ -34,6 +34,6 @@ public:
 	Protocol::PosInfo* GetPlayerInfo() { return PlayerInfo; }
 
 protected:
-	class Protocol::PosInfo* PlayerInfo; // 현재 위치
-	class Protocol::PosInfo* DestInfo; // 다른 플레이어들의 목적지 위치
+	class Protocol::PosInfo* PlayerInfo = nullptr; // 현재 위치
+	class Protocol::PosInfo* DestInfo = nullptr; // 다른 플레이어들의 목적지 위치
 };

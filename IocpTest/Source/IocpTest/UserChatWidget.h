@@ -9,6 +9,8 @@
 class UScrollBox;
 class UEditableText;
 
+class UChatSlotWidget;
+
 /**
  * 
  */
@@ -16,8 +18,8 @@ UCLASS()
 class IOCPTEST_API UUserChatWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
-public:
+
+protected:
 
 	virtual void NativeConstruct() override;
 
@@ -27,7 +29,21 @@ public:
 	UPROPERTY(Meta = (BindWidget))
 	UEditableText* EditableText_Chat;
 
+public:
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UChatSlotWidget> ChatSlotBP;
+
+public:
+
+	void AddChat(FString Str);
+
+public:
+
 	UFUNCTION()
 	void OnTextEntered(const FText& Text, ETextCommit::Type CommitMethod);
+
+
+
 
 };

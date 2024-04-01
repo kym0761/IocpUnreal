@@ -18,7 +18,9 @@ public:
 	//{
 	//	WRITE_LOCK;
 	//	if (Items.empty())
+	//  {
 	//		return T();
+	//  }
 
 	//	T ret = Items.front();
 	//	Items.pop();
@@ -36,7 +38,9 @@ public:
 	{
 		WRITE_LOCK;
 		while (T item = PopNoLock())
+		{
 			items.push_back(item);
+		}
 	}
 
 	void Clear()
@@ -49,8 +53,10 @@ private:
 	T PopNoLock()
 	{
 		if (Items.empty())
+		{
 			return T();
-
+		}
+			
 		T ret = Items.front();
 		Items.pop();
 		return ret;

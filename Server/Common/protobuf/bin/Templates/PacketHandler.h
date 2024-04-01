@@ -9,7 +9,7 @@
 using PacketHandlerFunc = std::function<bool(PacketSessionRef&, BYTE*, int32)>; //함수 포인터
 extern PacketHandlerFunc GPacketHandler[UINT16_MAX]; //필요할지도 모르는 함수 포인터들을 미리 만든다.
 
-// TODO : 자동화
+// 패킷 enum 자동화
 enum : uint16
 {
 {%- for pkt in parser.total_pkt %}
@@ -36,7 +36,6 @@ class F{{output}}
 {
 public:
 
-	// TODO : 자동화
 	static void Init()
 	{
 		for (int32 i = 0; i < UINT16_MAX; i++)
@@ -47,7 +46,11 @@ public:
 		//패킷이 늘어날 때마다 추가하는 자동화 위치.
 		//PKT_S_TEST에 대한 함수 등록
 {%- for pkt in parser.recv_pkt %}
-		GPacketHandler[PKT_{{pkt.name}}] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::{{pkt.name}}>(Handle_{{pkt.name}}, session, buffer, len); };
+		GPacketHandler[PKT_{{pkt.name}}] = 
+			[](PacketSessionRef& session, BYTE* buffer, int32 len) 
+			{
+				return HandlePacket<Protocol::{{pkt.name}}>(Handle_{{pkt.name}}, session, buffer, len); 
+			};
 {%- endfor %}
 	}
 
@@ -62,9 +65,12 @@ public:
 		return GPacketHandler[header->id](session, buffer, len);
 	}
 
-	// TODO : 자동화
+	// MakeSendBuffer 자동화
 {%- for pkt in parser.send_pkt %}
-	static SendBufferRef MakeSendBuffer(Protocol::{{pkt.name}}& pkt) { return MakeSendBuffer(pkt, PKT_{{pkt.name}}); }
+	static SendBufferRef MakeSendBuffer(Protocol::{{pkt.name}}& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_{{pkt.name}}); 
+	}
 {%- endfor %}
 
 private:
@@ -88,9 +94,12 @@ private:
 	template<typename T>
 	static SendBufferRef MakeSendBuffer(T& pkt, uint16 pktId)
 	{
+		//직렬화 코드
+
 		const uint16 dataSize = static_cast<uint16>(pkt.ByteSizeLong());
 		const uint16 packetSize = dataSize + sizeof(FPacketHeader);
 
+		//if는 언리얼 엔진에서 동작 .. else는 c++ iocp 서버에서 동작
 #if UE_BUILD_DEBUG + UE_BUILD_DEVELOPMENT + UE_BUILD_TEST + UE_BUILD_SHIPPING >= 1
 		SendBufferRef sendBuffer = MakeShared<FSendBuffer>(packetSize);
 #else

@@ -8,28 +8,6 @@
 
 class FSocket;
 
-//struct IOCPTEST_API FWorkPacketHeader
-//{
-//	FWorkPacketHeader() : PacketSize(0), PacketID(0)
-//	{
-//	}
-//
-//	FWorkPacketHeader(uint16 PacketSize, uint16 PacketID) : PacketSize(PacketSize), PacketID(PacketID)
-//	{
-//	}
-//
-//	friend FArchive& operator<<(FArchive& Ar, FWorkPacketHeader& Header)
-//	{
-//		Ar << Header.PacketSize;
-//		Ar << Header.PacketID;
-//		return Ar;
-//	}
-//
-//	uint16 PacketSize;
-//	uint16 PacketID;
-//};
-
-
 /**
  * 
  */
@@ -46,13 +24,11 @@ public:
 	void Destroy();
 
 private:
-	bool TryReceivePacket(TArray<uint8>& OutPacket);
+	bool ReceivePacket(TArray<uint8>& OutPacket);
 	bool ReceiveDesiredBytes(uint8* Results, int32 Size);
 
 protected:
-
 	FRunnableThread* Thread = nullptr;
-
 	bool bRunning = true;
 	FSocket* Socket;
 	TWeakPtr<class FPacketSession> WeakSessionRef;

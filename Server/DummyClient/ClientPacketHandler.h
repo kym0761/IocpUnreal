@@ -6,92 +6,146 @@
 #include "IocpTest.h"
 #endif
 
-using PacketHandlerFunc = std::function<bool(PacketSessionRef&, BYTE*, int32)>; //ÇÔ¼ö Æ÷ÀÎÅÍ
-extern PacketHandlerFunc GPacketHandler[UINT16_MAX]; //ÇÊ¿äÇÒÁöµµ ¸ğ¸£´Â ÇÔ¼ö Æ÷ÀÎÅÍµéÀ» ¹Ì¸® ¸¸µç´Ù.
+using PacketHandlerFunc = std::function<bool(PacketSessionRef&, BYTE*, int32)>; //í•¨ìˆ˜ í¬ì¸í„°
+extern PacketHandlerFunc GPacketHandler[UINT16_MAX]; //í•„ìš”í• ì§€ë„ ëª¨ë¥´ëŠ” í•¨ìˆ˜ í¬ì¸í„°ë“¤ì„ ë¯¸ë¦¬ ë§Œë“ ë‹¤.
 
-// TODO : ÀÚµ¿È­
+// TODO : ìë™í™”
 enum : uint16
 {
-	PKT_C_LOGIN = 1000,
-	PKT_S_LOGIN = 1001,
-	PKT_C_ENTER_GAME = 1002,
-	PKT_S_ENTER_GAME = 1003,
-	PKT_C_LEAVE_GAME = 1004,
-	PKT_S_LEAVE_GAME = 1005,
-	PKT_S_SPAWN = 1006,
-	PKT_S_DESPAWN = 1007,
-	PKT_C_MOVE = 1008,
-	PKT_S_MOVE = 1009,
-	PKT_C_CHAT = 1010,
-	PKT_S_CHAT = 1011,
+	PKT_C2S_LOGIN = 1000,
+	PKT_S2C_LOGIN = 1001,
+	PKT_C2S_ENTER_GAME = 1002,
+	PKT_S2C_ENTER_GAME = 1003,
+	PKT_C2S_LEAVE_GAME = 1004,
+	PKT_S2C_LEAVE_GAME = 1005,
+	PKT_S2C_SPAWN = 1006,
+	PKT_S2C_DESPAWN = 1007,
+	PKT_C2S_MOVE = 1008,
+	PKT_S2C_MOVE = 1009,
+	PKT_C2S_JUMP = 1010,
+	PKT_S2C_JUMP = 1011,
+	PKT_C2S_CHAT = 1012,
+	PKT_S2C_CHAT = 1013,
 };
 
 
 
 // Custom Handlers
 
-//INVALID´Â ½ÇÁ¦·Ğ »ç¿ëµÇÁö ¾ÊÀ» ÀÓ½Ã ÇÔ¼öÀÓ.
+//INVALIDëŠ” ì‹¤ì œë¡  ì‚¬ìš©ë˜ì§€ ì•Šì„ ì„ì‹œ í•¨ìˆ˜ì„.
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len);
 
-//¼±¾ğ¸¸ ÀÚµ¿È­
-//ÀÌ ÇÔ¼ö ±¸ÇöÀº »ç¿ëÀÚ°¡ Á÷Á¢ ¸¸µé¾î¾ß ÇÔ.
-// ÀÌÀ¯? ÀÚµ¿È­ ½Ã½ºÅÛÀº ÀÌ ÇÔ¼ö°¡ ¾î¶² ±â´ÉÀ» ÇÒÁö ¾Ë ¼ö ¾ø´Ù..
-bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt);
-bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt);
-bool Handle_S_LEAVE_GAME(PacketSessionRef& session, Protocol::S_LEAVE_GAME& pkt);
-bool Handle_S_SPAWN(PacketSessionRef& session, Protocol::S_SPAWN& pkt);
-bool Handle_S_DESPAWN(PacketSessionRef& session, Protocol::S_DESPAWN& pkt);
-bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt);
-bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt);
+//ì„ ì–¸ë§Œ ìë™í™”
+//ì´ í•¨ìˆ˜ êµ¬í˜„ì€ ì‚¬ìš©ìê°€ ì§ì ‘ ë§Œë“¤ì–´ì•¼ í•¨.
+// ì´ìœ ? ìë™í™” ì‹œìŠ¤í…œì€ ì´ í•¨ìˆ˜ê°€ ì–´ë–¤ ê¸°ëŠ¥ì„ í• ì§€ ì•Œ ìˆ˜ ì—†ë‹¤..
+bool Handle_S2C_LOGIN(PacketSessionRef& session, Protocol::S2C_LOGIN& pkt);
+bool Handle_S2C_ENTER_GAME(PacketSessionRef& session, Protocol::S2C_ENTER_GAME& pkt);
+//bool Handle_S2C_LEAVE_GAME(PacketSessionRef& session, Protocol::S2C_LEAVE_GAME& pkt);
+//bool Handle_S2C_SPAWN(PacketSessionRef& session, Protocol::S2C_SPAWN& pkt);
+//bool Handle_S2C_DESPAWN(PacketSessionRef& session, Protocol::S2C_DESPAWN& pkt);
+//bool Handle_S2C_MOVE(PacketSessionRef& session, Protocol::S2C_MOVE& pkt);
+//bool Handle_S2C_JUMP(PacketSessionRef& session, Protocol::S2C_JUMP& pkt);
+bool Handle_S2C_CHAT(PacketSessionRef& session, Protocol::S2C_CHAT& pkt);
 
 
 class FClientPacketHandler
 {
 public:
 
-	// TODO : ÀÚµ¿È­
 	static void Init()
 	{
 		for (int32 i = 0; i < UINT16_MAX; i++)
 		{
-			GPacketHandler[i] = Handle_INVALID; //ÇÔ¼ö¿¡ ÀÏ´Ü HANDLE INVALID¸¦ µî·Ï
+			GPacketHandler[i] = Handle_INVALID; //í•¨ìˆ˜ì— ì¼ë‹¨ HANDLE INVALIDë¥¼ ë“±ë¡
 		}
 
-		//ÆĞÅ¶ÀÌ ´Ã¾î³¯ ¶§¸¶´Ù Ãß°¡ÇÏ´Â ÀÚµ¿È­ À§Ä¡.
-		//PKT_S_TEST¿¡ ´ëÇÑ ÇÔ¼ö µî·Ï
-		GPacketHandler[PKT_S_LOGIN] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_LOGIN>(Handle_S_LOGIN, session, buffer, len); };
-		GPacketHandler[PKT_S_ENTER_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_ENTER_GAME>(Handle_S_ENTER_GAME, session, buffer, len); };
-		GPacketHandler[PKT_S_LEAVE_GAME] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_LEAVE_GAME>(Handle_S_LEAVE_GAME, session, buffer, len); };
-		GPacketHandler[PKT_S_SPAWN] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_SPAWN>(Handle_S_SPAWN, session, buffer, len); };
-		GPacketHandler[PKT_S_DESPAWN] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_DESPAWN>(Handle_S_DESPAWN, session, buffer, len); };
-		GPacketHandler[PKT_S_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_MOVE>(Handle_S_MOVE, session, buffer, len); };
-		GPacketHandler[PKT_S_CHAT] = [](PacketSessionRef& session, BYTE* buffer, int32 len) { return HandlePacket<Protocol::S_CHAT>(Handle_S_CHAT, session, buffer, len); };
+		//íŒ¨í‚·ì´ ëŠ˜ì–´ë‚  ë•Œë§ˆë‹¤ ì¶”ê°€í•˜ëŠ” ìë™í™” ìœ„ì¹˜.
+		//PKT_S_TESTì— ëŒ€í•œ í•¨ìˆ˜ ë“±ë¡
+		GPacketHandler[PKT_S2C_LOGIN] = 
+			[](PacketSessionRef& session, BYTE* buffer, int32 len) 
+			{
+				return HandlePacket<Protocol::S2C_LOGIN>(Handle_S2C_LOGIN, session, buffer, len); 
+			};
+		GPacketHandler[PKT_S2C_ENTER_GAME] = 
+			[](PacketSessionRef& session, BYTE* buffer, int32 len) 
+			{
+				return HandlePacket<Protocol::S2C_ENTER_GAME>(Handle_S2C_ENTER_GAME, session, buffer, len); 
+			};
+		//GPacketHandler[PKT_S2C_LEAVE_GAME] = 
+		//	[](PacketSessionRef& session, BYTE* buffer, int32 len) 
+		//	{
+		//		return HandlePacket<Protocol::S2C_LEAVE_GAME>(Handle_S2C_LEAVE_GAME, session, buffer, len); 
+		//	};
+		//GPacketHandler[PKT_S2C_SPAWN] = 
+		//	[](PacketSessionRef& session, BYTE* buffer, int32 len) 
+		//	{
+		//		return HandlePacket<Protocol::S2C_SPAWN>(Handle_S2C_SPAWN, session, buffer, len); 
+		//	};
+		//GPacketHandler[PKT_S2C_DESPAWN] = 
+		//	[](PacketSessionRef& session, BYTE* buffer, int32 len) 
+		//	{
+		//		return HandlePacket<Protocol::S2C_DESPAWN>(Handle_S2C_DESPAWN, session, buffer, len); 
+		//	};
+		//GPacketHandler[PKT_S2C_MOVE] = 
+		//	[](PacketSessionRef& session, BYTE* buffer, int32 len) 
+		//	{
+		//		return HandlePacket<Protocol::S2C_MOVE>(Handle_S2C_MOVE, session, buffer, len); 
+		//	};
+		//GPacketHandler[PKT_S2C_JUMP] = 
+		//	[](PacketSessionRef& session, BYTE* buffer, int32 len) 
+		//	{
+		//		return HandlePacket<Protocol::S2C_JUMP>(Handle_S2C_JUMP, session, buffer, len); 
+		//	};
+		GPacketHandler[PKT_S2C_CHAT] = 
+			[](PacketSessionRef& session, BYTE* buffer, int32 len) 
+			{
+				return HandlePacket<Protocol::S2C_CHAT>(Handle_S2C_CHAT, session, buffer, len); 
+			};
 	}
 
-	//¾î¶² Å¬¶óÀÌ¾ğÆ®°¡ ÆĞÅ¶À» º¸³½ °ÍÀÎÁö È®ÀÎÇÏ±â À§ÇØ sessionref¸¦ ¹Ş´Â´Ù.
+	//ì–´ë–¤ í´ë¼ì´ì–¸íŠ¸ê°€ íŒ¨í‚·ì„ ë³´ë‚¸ ê²ƒì¸ì§€ í™•ì¸í•˜ê¸° ìœ„í•´ sessionrefë¥¼ ë°›ëŠ”ë‹¤.
 	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
 	{
 		FPacketHeader* header = reinterpret_cast<FPacketHeader*>(buffer);
 
-		//Çì´õ id¿¡ ¸Â´Â ÆĞÅ¶ handle ÇÔ¼ö¸¦ È£Ãâ
-		//ÀÌ»óÇÑ id..¿¹¸¦ µé¸é ¾Æ¿¹ Á¸ÀçÇÏÁö ¾Ê´Â id¶ó¸é
-		//¾ÖÃÊ¿¡ HANDLE_INVALID·Î ¸·¾Æ³õÀ¸´Ï »ó°ü¾øÀ½.
+		//í—¤ë” idì— ë§ëŠ” íŒ¨í‚· handle í•¨ìˆ˜ë¥¼ í˜¸ì¶œ
+		//ì´ìƒí•œ id..ì˜ˆë¥¼ ë“¤ë©´ ì•„ì˜ˆ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” idë¼ë©´
+		//ì• ì´ˆì— HANDLE_INVALIDë¡œ ë§‰ì•„ë†“ìœ¼ë‹ˆ ìƒê´€ì—†ìŒ.
 		return GPacketHandler[header->id](session, buffer, len);
 	}
 
-	// TODO : ÀÚµ¿È­
-	static SendBufferRef MakeSendBuffer(Protocol::C_LOGIN& pkt) { return MakeSendBuffer(pkt, PKT_C_LOGIN); }
-	static SendBufferRef MakeSendBuffer(Protocol::C_ENTER_GAME& pkt) { return MakeSendBuffer(pkt, PKT_C_ENTER_GAME); }
-	static SendBufferRef MakeSendBuffer(Protocol::C_LEAVE_GAME& pkt) { return MakeSendBuffer(pkt, PKT_C_LEAVE_GAME); }
-	static SendBufferRef MakeSendBuffer(Protocol::C_MOVE& pkt) { return MakeSendBuffer(pkt, PKT_C_MOVE); }
-	static SendBufferRef MakeSendBuffer(Protocol::C_CHAT& pkt) { return MakeSendBuffer(pkt, PKT_C_CHAT); }
+	// TODO : ìë™í™”
+	static SendBufferRef MakeSendBuffer(Protocol::C2S_LOGIN& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_C2S_LOGIN); 
+	}
+	static SendBufferRef MakeSendBuffer(Protocol::C2S_ENTER_GAME& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_C2S_ENTER_GAME); 
+	}
+	//static SendBufferRef MakeSendBuffer(Protocol::C2S_LEAVE_GAME& pkt)
+	//{
+	//	return MakeSendBuffer(pkt, PKT_C2S_LEAVE_GAME); 
+	//}
+	//static SendBufferRef MakeSendBuffer(Protocol::C2S_MOVE& pkt)
+	//{
+	//	return MakeSendBuffer(pkt, PKT_C2S_MOVE); 
+	//}
+	//static SendBufferRef MakeSendBuffer(Protocol::C2S_JUMP& pkt)
+	//{
+	//	return MakeSendBuffer(pkt, PKT_C2S_JUMP); 
+	//}
+	static SendBufferRef MakeSendBuffer(Protocol::C2S_CHAT& pkt)
+	{
+		return MakeSendBuffer(pkt, PKT_C2S_CHAT); 
+	}
 
 private:
 
 	template<typename PacketType, typename ProcessFunc>
 	static bool HandlePacket(ProcessFunc func, PacketSessionRef& session, BYTE* buffer, int32 len)
 	{
-		//ÆĞÅ¶À» ¹Ş¾ÆÁÖ´Â ¿ªÇÒ.
+		//íŒ¨í‚·ì„ ë°›ì•„ì£¼ëŠ” ì—­í• .
 		PacketType pkt;
 		if (pkt.ParseFromArray(
 			buffer + sizeof(FPacketHeader),
@@ -100,7 +154,7 @@ private:
 			return false;
 		}
 
-		//¸¸µç ÆĞÅ¶À» func·Î µ¿ÀÛ½ÃÅ´.
+		//ë§Œë“  íŒ¨í‚·ì„ funcë¡œ ë™ì‘ì‹œí‚´.
 		return func(session, pkt);
 	}
 

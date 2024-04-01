@@ -9,10 +9,14 @@ PacketHandlerFunc GPacketHandler[UINT16_MAX];
 
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
 {
+	GEngine->AddOnScreenDebugMessage(
+		-1, 5.f, FColor::Red,
+		FString::Printf(TEXT("CALLED INVALID PACKET HANDLE FUNCTION")));
+
 	return false;
 }
 
-bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
+bool Handle_S2C_LOGIN(PacketSessionRef& session, Protocol::S2C_LOGIN& pkt)
 {
 	//예시 1
 	for (auto& Player : pkt.players())
@@ -26,14 +30,14 @@ bool Handle_S_LOGIN(PacketSessionRef& session, Protocol::S_LOGIN& pkt)
 	}
 
 	// 로비에서 캐릭터 선택했다고 가정함.
-	Protocol::C_ENTER_GAME EnterGamePkt;
+	Protocol::C2S_ENTER_GAME EnterGamePkt;
 	EnterGamePkt.set_playerindex(0);
 	SEND_PACKET(EnterGamePkt);
 
 	return true;
 }
 
-bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt)
+bool Handle_S2C_ENTER_GAME(PacketSessionRef& session, Protocol::S2C_ENTER_GAME& pkt)
 {
 	if (UTestGameInstance* GameInstance 
 		= Cast<UTestGameInstance>(GWorld->GetGameInstance()))
@@ -44,7 +48,7 @@ bool Handle_S_ENTER_GAME(PacketSessionRef& session, Protocol::S_ENTER_GAME& pkt)
 	return true;
 }
 
-bool Handle_S_LEAVE_GAME(PacketSessionRef& session, Protocol::S_LEAVE_GAME& pkt)
+bool Handle_S2C_LEAVE_GAME(PacketSessionRef& session, Protocol::S2C_LEAVE_GAME& pkt)
 {
 	if (UTestGameInstance* GameInstance
 		= Cast<UTestGameInstance>(GWorld->GetGameInstance())) 
@@ -61,7 +65,7 @@ bool Handle_S_LEAVE_GAME(PacketSessionRef& session, Protocol::S_LEAVE_GAME& pkt)
 	return true;
 }
 
-bool Handle_S_SPAWN(PacketSessionRef& session, Protocol::S_SPAWN& pkt)
+bool Handle_S2C_SPAWN(PacketSessionRef& session, Protocol::S2C_SPAWN& pkt)
 {
 	if (UTestGameInstance* GameInstance
 		= Cast<UTestGameInstance>(GWorld->GetGameInstance())) 
@@ -72,7 +76,7 @@ bool Handle_S_SPAWN(PacketSessionRef& session, Protocol::S_SPAWN& pkt)
 	return true;
 }
 
-bool Handle_S_DESPAWN(PacketSessionRef& session, Protocol::S_DESPAWN& pkt)
+bool Handle_S2C_DESPAWN(PacketSessionRef& session, Protocol::S2C_DESPAWN& pkt)
 {
 	if (UTestGameInstance* GameInstance
 		= Cast<UTestGameInstance>(GWorld->GetGameInstance())) 
@@ -83,7 +87,7 @@ bool Handle_S_DESPAWN(PacketSessionRef& session, Protocol::S_DESPAWN& pkt)
 	return true;
 }
 
-bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt)
+bool Handle_S2C_MOVE(PacketSessionRef& session, Protocol::S2C_MOVE& pkt)
 {
 	if (UTestGameInstance* GameInstance
 		= Cast<UTestGameInstance>(GWorld->GetGameInstance()))
@@ -94,7 +98,18 @@ bool Handle_S_MOVE(PacketSessionRef& session, Protocol::S_MOVE& pkt)
 	return true;
 }
 
-bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt)
+bool Handle_S2C_JUMP(PacketSessionRef& session, Protocol::S2C_JUMP& pkt)
+{
+	if (UTestGameInstance* GameInstance
+		= Cast<UTestGameInstance>(GWorld->GetGameInstance()))
+	{
+		GameInstance->HandleJump(pkt);
+	}
+
+	return true;
+}
+
+bool Handle_S2C_CHAT(PacketSessionRef& session, Protocol::S2C_CHAT& pkt)
 {
 	if (UTestGameInstance* GameInstance
 		= Cast<UTestGameInstance>(GWorld->GetGameInstance()))
@@ -103,6 +118,5 @@ bool Handle_S_CHAT(PacketSessionRef& session, Protocol::S_CHAT& pkt)
 	}
 
 	return true;
-
 }
 

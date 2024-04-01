@@ -30,6 +30,10 @@ public:
 protected:
 	EEventType	EventType;
 	IocpObjectRef Owner; // 이벤트의 owner
+
+	//Owner의 예시
+	//AcceptEvent의 Owner는 FListener거나 FSession일 것이다.
+
 };
 
 /*----------------
@@ -88,6 +92,6 @@ class FSendEvent : public FIocpEvent
 public:
 	FSendEvent() : FIocpEvent(EEventType::Send) { }
 
-	//레퍼런스 카운팅 관리를 Send이벤트에서 함
+	//레퍼런스 카운팅 관리를 Send이벤트에서 SendBuffer를 관리함
 	vector<SendBufferRef> SendBuffers;
 };

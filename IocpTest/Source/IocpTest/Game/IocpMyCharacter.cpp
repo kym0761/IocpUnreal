@@ -36,8 +36,6 @@ AIocpMyCharacter::AIocpMyCharacter()
 // Called when the game starts or when spawned
 void AIocpMyCharacter::BeginPlay()
 {
-	Super::BeginPlay();
-	
 	// Call the base class  
 	Super::BeginPlay();
 
@@ -82,7 +80,7 @@ void AIocpMyCharacter::Tick(float DeltaTime)
 	{
 		MovePacketSendTimer = MOVE_PACKET_SEND_DELAY;
 
-		Protocol::C_MOVE MovePkt;
+		Protocol::C2S_MOVE MovePkt;
 
 		{
 			Protocol::PosInfo* mutable_Info = MovePkt.mutable_info(); //수정가능한 info
@@ -158,7 +156,8 @@ void AIocpMyCharacter::Move(const FInputActionValue& Value)
 			DesiredMoveDirection.Normalize();
 
 			const FVector Location = GetActorLocation();
-			FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(Location, Location + DesiredMoveDirection);
+			FRotator Rotator = 
+				UKismetMathLibrary::FindLookAtRotation(Location, Location + DesiredMoveDirection);
 			DesiredYaw = Rotator.Yaw;
 		}
 
@@ -176,5 +175,14 @@ void AIocpMyCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AIocpMyCharacter::Jump()
+{
+	Super::Jump();
+
+	//클라이언트가 점프하면, 서버에 점프한 사실을 알려야함.
+	Protocol::C2S_JUMP jumpPkt;
+	SEND_PACKET(jumpPkt);
 }
 

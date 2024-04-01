@@ -62,7 +62,7 @@ int main()
 	ServerServiceRef service = make_shared<FServerService>(
 		FNetAddress(L"127.0.0.1", 7777),
 		make_shared<FIocpCore>(),
-		[=]() { return make_shared<FGameSession>(); }, // TODO : SessionManager 등
+		[=]() { return make_shared<FGameSession>(); }, // TODO : SessionManager 등이 필요할지도? -> 람다로 대체
 		100);
 
 
@@ -74,13 +74,12 @@ int main()
 			{
 				while (true)
 				{
-					//service->GetIocpCore()->Dispatch();
 					DoWorkerJob(service);
 				}
 			});
 	}
 
-	//Main Thread도 따로 실행
+	////Main Thread도 따로 실행
 	//DoWorkerJob(service);
 
 	//room의 updatetick 최초 실행
@@ -88,13 +87,7 @@ int main()
 
 	while (true)
 	{
-		//Protocol::S_CHAT pkt;
-		//pkt.set_msg("Hello Unreal");
-		//auto sendBuffer = FServerPacketHandler::MakeSendBuffer(pkt);
-
-		//GSessionManager.Broadcast(sendBuffer);
 		this_thread::sleep_for(1s);
-
 	}
 
 

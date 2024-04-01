@@ -7,30 +7,38 @@ RoomRef GRoom = make_shared<FRoom>();
 
 FRoom::FRoom()
 {
+	cout << "Room()" << endl;
 }
 
 FRoom::~FRoom()
 {
+	cout << "~Room()" << endl;
 }
 
 bool FRoom::EnterRoom(ObjectRef object, bool randPos)
 {
-	bool success = AddObject(object);
+	bool bSuccess = AddObject(object);
+
+	//if (bSuccess == false)
+	//{
+	//	cout << "AddObject Failed" << endl;
+	//	return false;
+	//}
 
 	if (randPos)
 	{
 		// 일단 임의의 위치에 배치할 계획
-		object->PosInfo->set_x(FServerUtils::GetRandom(0.f, 500.f));
-		object->PosInfo->set_y(FServerUtils::GetRandom(0.f, 500.f));
+		object->PosInfo->set_x(FServerUtils::GetRandom(-200.f, 200.f));
+		object->PosInfo->set_y(FServerUtils::GetRandom(-200.f, 200.f));
 		object->PosInfo->set_z(100.0f);
-		object->PosInfo->set_yaw(FServerUtils::GetRandom(0.f, 100.f));
+		object->PosInfo->set_yaw(FServerUtils::GetRandom(0.f, 359.f));
 	}
 
 	// 입장 사실을 지금 들어온 플레이어에게 알림
 	if (auto player = dynamic_pointer_cast<FPlayer>(object))
 	{
-		Protocol::S_ENTER_GAME enterGamePkt;
-		enterGamePkt.set_success(success);
+		Protocol::S2C_ENTER_GAME enterGamePkt;
+		enterGamePkt.set_success(bSuccess);
 
 		Protocol::ObjectInfo* objectInfo = new Protocol::ObjectInfo();
 		objectInfo->CopyFrom(*object->ObjectInfo);
@@ -39,12 +47,14 @@ bool FRoom::EnterRoom(ObjectRef object, bool randPos)
 
 		SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(enterGamePkt);
 		if (auto session = player->Session.lock())
+		{
 			session->Send(sendBuffer);
+		}
 	}
 
 	// 입장 사실을 이미 room에 있던 다른 플레이어들에게 알린다
 	{
-		Protocol::S_SPAWN spawnPkt;
+		Protocol::S2C_SPAWN spawnPkt;
 
 		Protocol::ObjectInfo* objectInfo = spawnPkt.add_players();
 		objectInfo->CopyFrom(*object->ObjectInfo);
@@ -56,10 +66,10 @@ bool FRoom::EnterRoom(ObjectRef object, bool randPos)
 	}
 
 
-	// 기존에 입장한 플레이어 목록을 새로 들어온 플레이어에게 전송
+	// 기존에 입장한 플레이어 정보들을 새로 들어온 플레이어에게 전송
 	if (auto player = dynamic_pointer_cast<FPlayer>(object))
 	{
-		Protocol::S_SPAWN spawnPkt;
+		Protocol::S2C_SPAWN spawnPkt;
 
 		for (auto& item : Objects)
 		{
@@ -74,41 +84,51 @@ bool FRoom::EnterRoom(ObjectRef object, bool randPos)
 
 		SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(spawnPkt);
 		if (auto session = player->Session.lock())
+		{
 			session->Send(sendBuffer);
+		}
 	}
 
-	return success;
+	return bSuccess;
 }
 
 bool FRoom::LeaveRoom(ObjectRef object)
 {
 	if (object == nullptr)
+	{
 		return false;
-
-	//WRITE_LOCK;
+	}
 
 	const uint64 objectId = object->ObjectInfo->object_id();
-	bool success = RemoveObject(objectId); //메모리 상에서는 여기서 사라짐.
+	bool bSuccess = RemoveObject(objectId); //메모리 상에서는 여기서 사라짐.
 
-	// 퇴장 사실을 퇴장하는 플레이어에게 알린다
+	//if (bSuccess == false)
+	//{
+	//	cout << "Remove Object failed." << endl;
+	//	return false;
+	//}
+
+	// 퇴장하는 플레이어에게 서버의 LeavePacket을 보내 퇴장 상태를 알린다
 	if (auto player = dynamic_pointer_cast<FPlayer>(object))
 	{
-		Protocol::S_LEAVE_GAME leaveGamePkt;
+		Protocol::S2C_LEAVE_GAME leaveGamePkt;
 
 		SendBufferRef sendBuffer = 
 			FServerPacketHandler::MakeSendBuffer(leaveGamePkt);
 		if (auto session = player->Session.lock())
+		{
 			session->Send(sendBuffer);
+		}
 	}
 
-	// 퇴장 사실을 알린다
+	// 모든 플레이어에게 퇴장하는 Player의 ObjectId를 보내 해당 캐릭터를 없애도록 함
 	//despawn한다.
 	{
-		Protocol::S_DESPAWN despawnPkt;
+		Protocol::S2C_DESPAWN despawnPkt;
 		despawnPkt.add_object_ids(objectId);
 
 		SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(despawnPkt);
-		Broadcast(sendBuffer, objectId);
+		Broadcast(sendBuffer, objectId); //퇴장하는 ObjectId는 제외하고 Broadcast
 
 		if (auto player = dynamic_pointer_cast<FPlayer>(object))
 		{
@@ -122,7 +142,7 @@ bool FRoom::LeaveRoom(ObjectRef object)
 
 	cout << "player " << object->ObjectInfo->object_id() << " is leaved.." << endl;
 
-	return success;
+	return bSuccess;
 }
 
 bool FRoom::HandleEnterPlayer(PlayerRef player)
@@ -135,10 +155,8 @@ bool FRoom::HandleLeavePlayer(PlayerRef player)
 	return LeaveRoom(player);
 }
 
-void FRoom::HandleMove(Protocol::C_MOVE pkt)
+void FRoom::HandleMove(Protocol::C2S_MOVE pkt)
 {
-	//WRITE_LOCK;
-
 	//없는 플레이어를 이동시키려고 함
 	const uint64 objectId = pkt.info().object_id();
 	if (Objects.find(objectId) == Objects.end())
@@ -155,7 +173,7 @@ void FRoom::HandleMove(Protocol::C_MOVE pkt)
 	player->PosInfo->CopyFrom(pkt.info());
 
 	{
-		Protocol::S_MOVE movePkt;
+		Protocol::S2C_MOVE movePkt;
 		{
 			Protocol::PosInfo* info = movePkt.mutable_info();
 			info->CopyFrom(pkt.info());
@@ -168,18 +186,18 @@ void FRoom::HandleMove(Protocol::C_MOVE pkt)
 
 }
 
-void FRoom::HandleChat(Protocol::C_CHAT pkt)
+void FRoom::HandleChat(Protocol::C2S_CHAT pkt)
 {
 }
 
-void FRoom::HandleChatFromPlayer(PlayerRef player, Protocol::C_CHAT pkt)
+void FRoom::HandleChatFromPlayer(PlayerRef player, Protocol::C2S_CHAT pkt)
 {
 
 	string str = pkt.msg();
 
 	uint64 id = player->ObjectInfo->object_id();
 
-	Protocol::S_CHAT sendChatPkt;
+	Protocol::S2C_CHAT sendChatPkt;
 
 	{
 		string* ms = sendChatPkt.mutable_msg();
@@ -189,6 +207,25 @@ void FRoom::HandleChatFromPlayer(PlayerRef player, Protocol::C_CHAT pkt)
 
 	SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(sendChatPkt);
 	Broadcast(sendBuffer);
+}
+
+void FRoom::HandleJump(uint64 ObjectId)
+{
+	//없는 플레이어를 점프하려고 함
+	if (Objects.find(ObjectId) == Objects.end())
+	{
+		return;
+	}
+
+	Protocol::S2C_JUMP jumpPkt;
+
+	{
+		jumpPkt.set_playerid(ObjectId);
+	}
+
+	SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(jumpPkt);
+	Broadcast(sendBuffer, ObjectId);
+
 }
 
 void FRoom::UpdateTick()
@@ -204,43 +241,15 @@ RoomRef FRoom::GetRoomRef()
 	return  static_pointer_cast<FRoom>(shared_from_this());
 }
 
-//bool FRoom::EnterPlayer(PlayerRef player)
-//{
-//	////handleEnter에서 lock을 걸었으므로, 여기서 걸면 안됨!
-//
-//	//// 있다면 문제가 있다.
-//	//if (PlayersInRoom.find(player->ObjectInfo->object_id()) != PlayersInRoom.end())
-//	//	return false;
-//
-//	//PlayersInRoom.insert(
-//	//	make_pair(player->ObjectInfo->object_id(), player));
-//
-//	//player->Room.store(GetRoomRef());
-//
-//	//return true;
-//}
-//
-//bool FRoom::LeavePlayer(uint64 objectId)
-//{
-//	//// 없다면 문제가 있다.
-//	//if (PlayersInRoom.find(objectId) == PlayersInRoom.end())
-//	//	return false;
-//
-//	//PlayerRef player = PlayersInRoom[objectId];
-//	//player->Room.store(weak_ptr<FRoom>());
-//
-//	//PlayersInRoom.erase(objectId);
-//
-//	//return true;
-//}
-
 bool FRoom::AddObject(ObjectRef object)
 {
 	//handleEnter에서 lock을 걸었으므로, 여기서 걸면 안됨!
 
 	// 있다면 문제가 있다.
 	if (Objects.find(object->ObjectInfo->object_id()) != Objects.end())
+	{
 		return false;
+	}
 
 	Objects.insert(
 		make_pair(object->ObjectInfo->object_id(), object));
@@ -254,7 +263,9 @@ bool FRoom::RemoveObject(uint64 objectId)
 {
 	// 없다면 문제가 있다.
 	if (Objects.find(objectId) == Objects.end())
+	{
 		return false;
+	}
 
 	ObjectRef object = Objects[objectId];
 	PlayerRef player = dynamic_pointer_cast<FPlayer>(object);
@@ -273,7 +284,6 @@ void FRoom::Broadcast(SendBufferRef sendBuffer, uint64 exceptId)
 	for (auto& item : Objects)
 	{
 		PlayerRef player = dynamic_pointer_cast<FPlayer>(item.second);
-
 		if (player == nullptr)
 		{
 			continue;

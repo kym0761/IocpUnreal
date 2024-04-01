@@ -32,7 +32,6 @@ using ListenerRef = std::shared_ptr<class FListener>;
 using ServerServiceRef = std::shared_ptr<class FServerService>;
 using ClientServiceRef = std::shared_ptr<class FClientService>;
 using SendBufferRef = std::shared_ptr<class FSendBuffer>;
-//using SendBufferChunkRef = std::shared_ptr<class FSendBufferChunk>;
 using PacketSessionRef = std::shared_ptr<class FPacketSession>;
 using JobRef = std::shared_ptr<class FJob>;
 using JobQueueRef = std::shared_ptr<class FJobQueue>;

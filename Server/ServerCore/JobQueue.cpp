@@ -12,9 +12,10 @@ void FJobQueue::Push(JobRef job, bool bPushOnly)
 	//첫번째 Job을 넣은 쓰레드가 실행까지 담당
 	//다른 쓰레드가 Job을 넣고 
 	//JobQueue 안의 개수가 1이상이면 이미 처리하고 있는 중이니 스킵함.
+	//JobCount.fetch_add()의 prevCount가 0이 아니라면 다른 쓰레드가 처리하고 있다는 점이 보장됨.
 	if (prevCount == 0)
 	{
-		// 현재 쓰레드가 JobQueue를 사용중이 아니라면 Execute()gkdu Jobqueue 실행
+		// 현재 쓰레드가 JobQueue를 사용중이 아니라면 Execute()하여 Jobqueue 실행
 		if (LCurrentJobQueue == nullptr && bPushOnly == false)
 		{
 			Execute();
