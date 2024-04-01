@@ -19,7 +19,6 @@ public:
 	bool HandleLeavePlayer(PlayerRef player);
 	void HandleMove(Protocol::C2S_MOVE pkt);
 
-	void HandleChat(Protocol::C2S_CHAT pkt);
 	void HandleChatFromPlayer(PlayerRef player, Protocol::C2S_CHAT pkt);
 
 	void HandleJump(uint64 ObjectId);

@@ -25,7 +25,16 @@ void UUserChatWidget::AddChat(FString Str)
 	if (IsValid(chatSlot))
 	{
 		chatSlot->SetChatText(Str);
+
+		float prevOffset = ScrollBox_ChatScroll->GetScrollOffset();
+		float prevOffsetOfEnd = ScrollBox_ChatScroll->GetScrollOffsetOfEnd();
 		ScrollBox_ChatScroll->AddChild(chatSlot);
+
+		//채팅 Slot 추가 전에 스크롤 위치가 맨 아래였다면, Slot 추가 후에도 스크롤이 맨 아래를 유지
+		if (FMath::IsNearlyEqual(prevOffset, prevOffsetOfEnd))
+		{
+			ScrollBox_ChatScroll->ScrollToEnd();
+		}
 	}
 	
 }

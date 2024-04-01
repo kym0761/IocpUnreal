@@ -89,6 +89,23 @@ bool FRoom::EnterRoom(ObjectRef object, bool randPos)
 		}
 	}
 
+	//TODO : 입장시 채팅창에 알림 
+	cout << "Player " << object->ObjectInfo->object_id() << "Entered." << endl;
+	{
+		Protocol::S2C_CHAT enterChatPkt;
+
+		uint64 id = object->ObjectInfo->object_id();
+		string* ms = enterChatPkt.mutable_msg();
+		*ms = "Player " + to_string(id) + " Entered.";
+		enterChatPkt.set_playerid(id);
+
+		//직렬화 후 broadcast.
+		SendBufferRef sendBuffer =
+			FServerPacketHandler::MakeSendBuffer(enterChatPkt);
+		Broadcast(sendBuffer);
+	}
+
+
 	return bSuccess;
 }
 
@@ -130,17 +147,34 @@ bool FRoom::LeaveRoom(ObjectRef object)
 		SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(despawnPkt);
 		Broadcast(sendBuffer, objectId); //퇴장하는 ObjectId는 제외하고 Broadcast
 
-		if (auto player = dynamic_pointer_cast<FPlayer>(object))
-		{
-			if (auto session = player->Session.lock())
-			{
-				session->Send(sendBuffer);
-			}
-		}
+		////나가는 당사자인 플레이어도?
+		//if (auto player = dynamic_pointer_cast<FPlayer>(object))
+		//{
+		//	if (auto session = player->Session.lock())
+		//	{
+		//		session->Send(sendBuffer);
+		//	}
+		//}
 		
 	}
 
+	//TODO : 나갈 시 플레이어들에게 알림.
 	cout << "player " << object->ObjectInfo->object_id() << " is leaved.." << endl;
+	{
+		Protocol::S2C_CHAT leaveChatPkt;
+
+		uint64 id = object->ObjectInfo->object_id();
+		string* ms = leaveChatPkt.mutable_msg();
+		*ms = "Player " + to_string(id) + " is Leaved.";
+		leaveChatPkt.set_playerid(id);
+
+		//직렬화 후 broadcast.
+		SendBufferRef sendBuffer =
+			FServerPacketHandler::MakeSendBuffer(leaveChatPkt);
+		Broadcast(sendBuffer);
+		
+	}
+
 
 	return bSuccess;
 }
@@ -186,15 +220,9 @@ void FRoom::HandleMove(Protocol::C2S_MOVE pkt)
 
 }
 
-void FRoom::HandleChat(Protocol::C2S_CHAT pkt)
-{
-}
-
 void FRoom::HandleChatFromPlayer(PlayerRef player, Protocol::C2S_CHAT pkt)
 {
-
 	string str = pkt.msg();
-
 	uint64 id = player->ObjectInfo->object_id();
 
 	Protocol::S2C_CHAT sendChatPkt;
@@ -224,7 +252,7 @@ void FRoom::HandleJump(uint64 ObjectId)
 	}
 
 	SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(jumpPkt);
-	Broadcast(sendBuffer, ObjectId);
+	Broadcast(sendBuffer, ObjectId); //플레이어 점프 당사자인 클라이언트는 제외
 
 }
 

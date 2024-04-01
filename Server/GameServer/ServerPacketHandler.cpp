@@ -143,15 +143,20 @@ bool Handle_C2S_CHAT(PacketSessionRef& session, Protocol::C2S_CHAT& pkt)
 		return false;
 	}
 
-	string s = pkt.msg();
+	//서버 ChatMsg 확인 용도
+	//필요없으면 없앨 것.
+	{
+		string s = pkt.msg();
 
-	//utf-8 -> utf-16
-	int nLen = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.size(), NULL, NULL);
-	wstring ws(nLen, 0); 
-	MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.size(), ws.data(), nLen);
+		//utf-8 -> utf-16
+		int nLen = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.size(), NULL, NULL);
+		
+		wstring ws(nLen, 0);
+		MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.size(), ws.data(), nLen);
 
-	wcout.imbue(locale("kor"));
-	wcout << ws << endl;
+		wcout.imbue(locale("kor"));
+		wcout << ws << endl;
+	}
 
 	GRoom->DoAsync(&FRoom::HandleChatFromPlayer, player, pkt);
 

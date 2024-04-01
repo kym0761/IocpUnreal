@@ -231,8 +231,15 @@ void UTestGameInstance::HandleMove(const Protocol::S2C_MOVE& MovePkt)
 	//그 부분을 막기 위해서 S2C_Move 패킷은 클라이언트의 플레이어는 제외함.
 	//if (Player->IsMyCharacter())
 	//{
+	//	return;
+	//}
+
+
+	//if (Player->IsMyCharacter())
+	//{
 	//	FVector playerLocation = Player->GetActorLocation();
 	//	FVector compareLocation = FVector(MovePkt.info().x(), MovePkt.info().y(), MovePkt.info().z());
+	//	
 	//	//콜리전 등의 이유로 위치가 잘못되는 부분을 위해서 보정함.
 	//	if (FVector::Distance(playerLocation, compareLocation) < 10.0f)
 	//	{
@@ -240,11 +247,6 @@ void UTestGameInstance::HandleMove(const Protocol::S2C_MOVE& MovePkt)
 	//	}
 	//	
 	//}
-
-	if (Player->IsMyCharacter())
-	{
-		return;
-	}
 
 		
 	const Protocol::PosInfo& Info = MovePkt.info();
@@ -298,7 +300,7 @@ void UTestGameInstance::HandleJump(const Protocol::S2C_JUMP& JumpPkt)
 	const uint64 objectId = JumpPkt.playerid();
 
 	auto playerCharacter = Players[objectId];
-	if (IsValid(playerCharacter) && !playerCharacter->IsMyCharacter())
+	if (IsValid(playerCharacter)) //&& !playerCharacter->IsMyCharacter()) // 서버 쪽에서 이미 S2C Jump 보낼때 Broadcast에서 점프를 실행한 클라이언트 쪽의 플레이어 점프를 제외시켰다.
 	{
 		playerCharacter->Jump();
 	}
