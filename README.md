@@ -4,19 +4,74 @@
 
 언리얼 데디케이티드 서버가 아닌 C++ 소켓을 사용함.
 
+서버는 설명할 내용이 길어 클라이언트의 설명을 먼저한 뒤에 서버 설명을 적어놓는다.
+
+# IocpTest
+
+만들어진 IOCP 서버를 언리얼 엔진에 어떻게 사용할지 보여주는 예시 언리얼 프로젝트다.
+
+언리얼 엔진의 소켓은 논블로킹이 아니고 블로킹 소켓이므로, 소켓을 위한 쓰레드를 따로 생성하여 소켓 통신을 해야한다.
+
+## IocpTest의 주요 클래스
+
+### NetworkWorker
+
+위에서 설명한대로, 소켓을 위해 쓰레드를 생성하여 소켓 통신을 해야한다.
+
+Send, Recv마다 따로 FRunnable로 worker를 구현한다.
+
+각 쓰레드가 담당하는 Worker는 직접 언리얼 엔진의 오브젝트의 일처리를 해줄 수는 없고 PacketSession의 Queue를 통해 받은 패킷을 언리얼 엔진 컨텐츠로 전달하거나 보낼 패킷을 받는다.
+
+### TestGameInstance
+
+언리얼 엔진 클라이언트가 실행되면 Socket 연결을 시도한다.
+
+연결을 하는 동안은 잠시 언리얼 엔진 클라이언트가 멈춘다.(블로킹 소켓이므로)
+
+연결이 완료되면 GameSever에 대한 Session을 만들고 실행하며, 접속 패킷인 C2S_LOGIN을 생성하여 서버로 보낸다.
+
+그 외에도 구현한 각 패킷에 대해 중앙 처리를 담당한다.
+
+```
+Recv : 받은 패킷 -> Session -> GameInstance -> (패킷처리는 패킷에 따라 다름)
+
+Send : 보내는 패킷 <- Session <- GameInstance <- (채팅, 이동, 로그아웃)
+```
+
+### PacketSession
+
+언리얼 클라이언트가 접속한 서버에 대한 접속 정보를 나타내는 세션이다.
+
+서버의 세션이 생성되면 위에 설명했던 NetworkWorker를 각각 생성하여 Send, Recv를 수행하기 시작한다.
+
+### IocpCharacter
+
+언리얼 클라이언트가 실행될 때마다 서버에 클라이언트가 접속해 Object로 관리되는데, 언리얼 엔진 클라이언트에서도 서버에서 받은 자신과 다른 클라이언트의 정보를 얻어 화면 상에 캐릭터가 생성될 것이다.
+
+Base/My로 구분하여 Base는 내가 조종하지 않는 언리얼 클라이언트의 캐릭터, My는 내가 조종할 캐릭터로 구분한다.
+
+BaseCharacter는 다른 클라이언트가 Move할 때마다 서버에서 해당 Object의 id를 클라이언트에 보내 Object id에 맞는 캐릭터가 이동하는 것을 볼 수 있을 것이다.
+
+반대로, MyCharacter는 내가 스스로 WASD, 스페이스바 등의 입력으로 움직일 수 있는데, 이 움직임에 맞춰서 서버에 패킷을 보내고 다른 클라이언트에도 내 움직임을 반영하도록 할 것이다.
+
+
 # Server
 
 IOCP를 기반으로 만들어진 서버다.
 
 DummyClient는 테스트를 위한 클라이언트로, 언리얼 엔진을 클라이언트로 사용하게 되어 더이상 사용하지 않으므로 생략함.
 
-ServerCore와 GameServer만 설명
+그러므로, ServerCore와 GameServer만 설명한다.
 
 클래스들의 명칭 앞에 F 붙은 이유는 언리얼 사용하면서 대부분의 사용자 클래스와 구조체에 F가 붙게 만들도록 한 것이 익숙하여 F를 붙임. 
 
 예를 들면, FListener 클래스 이름을 설정하면 FListener Listener; 처럼 인스턴스 이름을 설정할 때 편함.
 
 ## ServerCore
+
+서버 구현에 필요한 정적라이브러리
+
+GameServer를 빌드하기 전에 ServerCore를 먼저 빌드해주어야 정상적으로 빌드가 된다.
 
 ### Main/CoreGlobal
 
@@ -75,7 +130,7 @@ RecvBuffer에 정리된 내용대로, ReadPos 와 WritePos의 위치가 같아�
 
 Recv와 아래 Send 버퍼는 Session에서 사용될 것이다.
 
-Recv 동작 설명
+#### Recv 동작 설명
 
 1. RegisterRecv에서 RecvBuffer 주소와 공간을 WSABUF에 넣은 뒤, RecvEvent로 복귀한 이벤트를 WSARecv()로 IOCP에 등록한다.
 2. IocpCore에서 GetQueued...()를 통해 복구된 RecvEvent의 Owner인 Session의 Dispatch가 동작하여 ProcessRecv()가 동작됨.
@@ -197,8 +252,6 @@ GameSession에서 OnConnect() OnDisconnect()에서 GameSession을 추가/제거�
 ### ServerPacketHandler
 
 ProtoBuffer를 사용하여 생성된 패킷을 처리한다.
-
-방대한 내용이라 직접 .h .cpp를 보고 해석해야하는데,
 
 패킷의 id를 보고 각 패킷에 맞는 Handle_XXX() 함수가 어떤 행동을 해야 하는지 .cpp에 구현해야함.
 

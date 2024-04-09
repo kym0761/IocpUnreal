@@ -46,7 +46,7 @@ void UTestGameInstance::ConnectToGameServer()
 		GameServerSession->Run();
 
 
-		// TEMP : Lobby에서 캐릭터 선택창 등
+		// TEMP : Lobby에서 캐릭터 선택창 등이 있다고 가정하여 게임에 접속을 시도함.
 		{
 			Protocol::C2S_LOGIN pkt;
 			SendBufferRef sendBuffer 

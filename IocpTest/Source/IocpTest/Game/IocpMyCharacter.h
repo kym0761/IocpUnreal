@@ -74,6 +74,7 @@ protected:
 	float DesiredYaw;
 
 	// Dirty Flag Test
+
 	//이전에 받았던 입력 값을 저장
 	FVector2D LastDesiredInput;
 

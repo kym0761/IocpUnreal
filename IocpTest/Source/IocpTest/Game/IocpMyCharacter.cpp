@@ -160,7 +160,6 @@ void AIocpMyCharacter::Move(const FInputActionValue& Value)
 				UKismetMathLibrary::FindLookAtRotation(Location, Location + DesiredMoveDirection);
 			DesiredYaw = Rotator.Yaw;
 		}
-
 	}
 }
 

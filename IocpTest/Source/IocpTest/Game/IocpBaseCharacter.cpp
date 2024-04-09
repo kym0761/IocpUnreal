@@ -63,18 +63,8 @@ AIocpBaseCharacter::~AIocpBaseCharacter()
 void AIocpBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	//if (PlayerInfo == nullptr)
-	//{
-	//	PlayerInfo = new Protocol::PosInfo();
-	//}
-	//
-	//if (DestInfo == nullptr)
-	//{
-	//	DestInfo = new Protocol::PosInfo();
-	//}
-	
 
+	//패킷에 맞춰 캐릭터의 위치를 설정함
 	{
 		FVector Location = GetActorLocation();
 		DestInfo->set_x(Location.X);

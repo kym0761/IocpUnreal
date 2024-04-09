@@ -21,7 +21,10 @@ class IOCPTEST_API UTestGameInstance : public UGameInstance
 	
 public:
 
-	//블루프린트에서 실행을 담당
+	/*
+	간편한 구현을 위해 실행을 블루프린트에서 담당하도록 한다.
+	어디에서 동작할지는 함수 위에 써놓음.
+	*/
 
 	//beginplay
 	UFUNCTION(BlueprintCallable)
