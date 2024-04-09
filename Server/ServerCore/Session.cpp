@@ -21,6 +21,7 @@ void FSession::Send(SendBufferRef sendBuffer)
 		return;
 	}
 
+	//registerSend를 동작하기 위한 bool 변수
 	bool bRegisterSend = false;
 
 	{
@@ -37,11 +38,14 @@ void FSession::Send(SendBufferRef sendBuffer)
 			RegisterSend();
 		}*/
 
+		//send 등록이 되지 않았다면, true로 세팅하도록 한다.
+		//send 등록이 된 상태면 SendQueue에 sendBuffer만 넣어주고 Send()를 종료함.
 		if (bSendRegistered.exchange(true) == false)
 		{
 			bRegisterSend = true;
 		}
 
+		//위에서 bRegisterSend값이 true가 되면 실질적인 Send 동작을 시작함.
 		if (bRegisterSend)
 		{
 			RegisterSend();
@@ -216,6 +220,8 @@ void FSession::RegisterSend()
 
 	// 보낼 데이터를 SendEvent에 등록
 	{
+		//FSession::Send()에서 Lock을 걸고 시작하므로 여기에선 이제 Lock을 걸지 않음.
+		//RegisterSend()가 완료될 때까지 Lock이 걸리므로 queue에 접근하는 다른 쓰레드는 존재하지 않음.
 		//WRITE_LOCK;
 
 		int32 writeSize = 0;
@@ -313,7 +319,8 @@ void FSession::ProcessRecv(int32 numOfBytes)
 	//processLen이 데이터 범위를 벗어나면 실패
 	int32 dataSize = RecvBuffer.GetDataSize();
 	int32 processLen = OnRecv(RecvBuffer.GetReadPos(), dataSize);
-	if (processLen < 0 || dataSize < processLen || RecvBuffer.OnRead(processLen) == false)
+	if (processLen < 0 || dataSize < processLen 
+		|| RecvBuffer.OnRead(processLen) == false)
 	{
 		Disconnect(L"OnRead Overflow");
 		return;
@@ -344,6 +351,8 @@ void FSession::ProcessSend(int32 numOfBytes)
 	OnSend(numOfBytes);
 
 	//SendQueue 경합
+	//Send()에서도 Lock을 잡는 것과 비슷한 원리다.
+	//이후 만약 RegisterSend()를 할 것이 남아있다면 다시 Lock을 걸어야함.
 	WRITE_LOCK;
 
 	// sendqueue를 다 보내줬으면 bSendRegistered false하여 다음 send가 동작하도록 함
