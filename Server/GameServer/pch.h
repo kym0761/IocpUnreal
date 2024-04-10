@@ -30,3 +30,6 @@ using PlayerRef = shared_ptr<class FPlayer>;
 	SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(pkt);	\
 	session->Send(sendBuffer);
 
+#include <fstream>
+#include <ostream>
+#include <ctime>

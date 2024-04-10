@@ -143,19 +143,45 @@ bool Handle_C2S_CHAT(PacketSessionRef& session, Protocol::C2S_CHAT& pkt)
 		return false;
 	}
 
-	//서버 ChatMsg 확인 용도
-	//필요없으면 없앨 것.
+	//서버에서 클라이언트들의 ChatMsg 확인 용도 및 로그 파일 추가
 	{
 		string s = pkt.msg();
 
+		//protobuf가 utf-8만 지원하는 관계로 원래 의도인 utf-16으로 변환해야함.
 		//utf-8 -> utf-16
+		//1. 길이를 잰다.
+		//2. 길이에 맞춰 wstring으로 변환한다.
 		int nLen = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.size(), NULL, NULL);
-		
 		wstring ws(nLen, 0);
 		MultiByteToWideChar(CP_UTF8, 0, s.c_str(), s.size(), ws.data(), nLen);
 
+		//날짜 및 시간
+		std::time_t now = std::time(nullptr);
+		tm tm01;
+
+		localtime_s(&tm01, &now);
+
+		//날짜 및 시간 파싱
+		wstring date = to_wstring(tm01.tm_year + 1900) + L"." +
+			to_wstring(tm01.tm_mon + 1) + L"." +
+			to_wstring(tm01.tm_mday) + L"_" +
+			to_wstring(tm01.tm_hour) + L":" +
+			to_wstring(tm01.tm_min) + L":" +
+			to_wstring(tm01.tm_sec);
+
+		//[날짜 및 시간] 플레이어 이름 : 채팅 내용
+		ws = L"[" + date + L"]" + L"\t\t" + L"Player " + to_wstring(player->ObjectInfo->object_id()) + L" : " + ws;
+
 		wcout.imbue(locale("kor"));
 		wcout << ws << endl;
+
+		//텍스트 파일에 채팅 로그 저장.
+		wofstream fout;
+		fout.imbue(locale("kor"));
+
+		fout.open("ChatLog" + GRoom->ServerStartTime + ".txt", ios::out | ios::app);
+		fout << ws;
+		fout << "\n";
 	}
 
 	GRoom->DoAsync(&FRoom::HandleChatFromPlayer, player, pkt);

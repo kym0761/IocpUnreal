@@ -280,8 +280,8 @@ void UTestGameInstance::HandleChat(const Protocol::S2C_CHAT& ChatPkt)
 
 	auto msg = ChatPkt.msg();
 	FString str = *FString(UTF8_TO_TCHAR(msg.c_str())); //utf-8 에서 utf-16
-
-	UserChatWidget->AddChat(str);
+	Protocol::ChatType chatType = ChatPkt.chattype();
+	UserChatWidget->AddChat(str, chatType);
 }
 
 void UTestGameInstance::HandleJump(const Protocol::S2C_JUMP& JumpPkt)

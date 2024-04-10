@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "IocpTest.h"
 #include "Blueprint/UserWidget.h"
 #include "UserChatWidget.generated.h"
 
@@ -36,7 +37,7 @@ public:
 
 public:
 
-	void AddChat(FString Str);
+	void AddChat(FString Str, Protocol::ChatType ChatType);
 
 public:
 

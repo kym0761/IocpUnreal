@@ -156,6 +156,31 @@ inline bool MoveState_Parse(
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<MoveState>(
     MoveState_descriptor(), name, value);
 }
+enum ChatType : int {
+  CHAT_PLAYER = 0,
+  CHAT_SYSTEM = 1,
+  ChatType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  ChatType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool ChatType_IsValid(int value);
+constexpr ChatType ChatType_MIN = CHAT_PLAYER;
+constexpr ChatType ChatType_MAX = CHAT_SYSTEM;
+constexpr int ChatType_ARRAYSIZE = ChatType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ChatType_descriptor();
+template<typename T>
+inline const std::string& ChatType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, ChatType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function ChatType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    ChatType_descriptor(), enum_t_value);
+}
+inline bool ChatType_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, ChatType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<ChatType>(
+    ChatType_descriptor(), name, value);
+}
 // ===================================================================
 
 
@@ -197,6 +222,11 @@ template <> struct is_proto_enum< ::Protocol::MoveState> : ::std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::MoveState>() {
   return ::Protocol::MoveState_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::ChatType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::ChatType>() {
+  return ::Protocol::ChatType_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

@@ -8,6 +8,21 @@ RoomRef GRoom = make_shared<FRoom>();
 FRoom::FRoom()
 {
 	cout << "Room()" << endl;
+
+	//날짜 및 시간
+	std::time_t now = std::time(nullptr);
+	tm tm01;
+
+	localtime_s(&tm01, &now);
+
+	//날짜 및 시간 파싱
+	string date = to_string(tm01.tm_year + 1900) + "_" +
+		to_string(tm01.tm_mon + 1) + "_" +
+		to_string(tm01.tm_mday) + "_" +
+		to_string(tm01.tm_hour) + "_" +
+		to_string(tm01.tm_min);
+
+	ServerStartTime = date;
 }
 
 FRoom::~FRoom()
@@ -89,8 +104,8 @@ bool FRoom::EnterRoom(ObjectRef object, bool randPos)
 		}
 	}
 
-	//TODO : 입장시 채팅창에 알림 
-	cout << "Player " << object->ObjectInfo->object_id() << "Entered." << endl;
+	//입장시 채팅창에 입장한 것을 알림 
+	cout << "Player " << object->ObjectInfo->object_id() << " Entered." << endl;
 	{
 		Protocol::S2C_CHAT enterChatPkt;
 
@@ -98,6 +113,7 @@ bool FRoom::EnterRoom(ObjectRef object, bool randPos)
 		string* ms = enterChatPkt.mutable_msg();
 		*ms = "Player " + to_string(id) + " Entered.";
 		enterChatPkt.set_playerid(id);
+		enterChatPkt.set_chattype(Protocol::ChatType::CHAT_SYSTEM);
 
 		//직렬화 후 broadcast.
 		SendBufferRef sendBuffer =
@@ -158,15 +174,16 @@ bool FRoom::LeaveRoom(ObjectRef object)
 		
 	}
 
-	//TODO : 나갈 시 플레이어들에게 알림.
-	cout << "player " << object->ObjectInfo->object_id() << " is leaved.." << endl;
+	//나갈 시 플레이어들에게 채팅으로 알림.
+	cout << "player " << object->ObjectInfo->object_id() << " leaved.." << endl;
 	{
 		Protocol::S2C_CHAT leaveChatPkt;
 
 		uint64 id = object->ObjectInfo->object_id();
 		string* ms = leaveChatPkt.mutable_msg();
-		*ms = "Player " + to_string(id) + " is Leaved.";
+		*ms = "Player " + to_string(id) + " Leaved.";
 		leaveChatPkt.set_playerid(id);
+		leaveChatPkt.set_chattype(Protocol::ChatType::CHAT_SYSTEM);
 
 		//직렬화 후 broadcast.
 		SendBufferRef sendBuffer =
@@ -231,6 +248,7 @@ void FRoom::HandleChatFromPlayer(PlayerRef player, Protocol::C2S_CHAT pkt)
 		string* ms = sendChatPkt.mutable_msg();
 		*ms = to_string(id) + " Player : " + str;
 		sendChatPkt.set_playerid(id);
+		sendChatPkt.set_chattype(Protocol::ChatType::CHAT_PLAYER);
 	}
 
 	SendBufferRef sendBuffer = FServerPacketHandler::MakeSendBuffer(sendChatPkt);

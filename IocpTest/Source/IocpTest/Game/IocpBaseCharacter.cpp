@@ -93,7 +93,6 @@ void AIocpBaseCharacter::Tick(float DeltaTime)
 
 	if (!IsMyCharacter())
 	{
-		
 		const Protocol::MoveState state = PlayerInfo->state();
 
 		if (state == Protocol::MOVE_STATE_RUN)
@@ -105,7 +104,6 @@ void AIocpBaseCharacter::Tick(float DeltaTime)
 			//근데 사실 possess 세팅을 spawn & place world해서 aicontroller가 붙으면 딱히 문제 없다.
 			AddMovementInput(GetActorForwardVector());
 		}
-
 
 	}
 
@@ -128,12 +126,6 @@ void AIocpBaseCharacter::SetMoveState(Protocol::MoveState State)
 
 void AIocpBaseCharacter::SetPlayerInfo(const Protocol::PosInfo& Info)
 {
-	//if (PlayerInfo == nullptr)
-	//{
-	//	return;
-	//}
-
-
 	if (PlayerInfo->object_id() != 0) //object id를 변경하려는 시도가 있으면 비정상적임
 	{
 		assert(PlayerInfo->object_id() == Info.object_id());
@@ -151,11 +143,6 @@ void AIocpBaseCharacter::SetPlayerInfo(const Protocol::PosInfo& Info)
 
 void AIocpBaseCharacter::SetDestInfo(const Protocol::PosInfo& Info)
 {
-	//if (PlayerInfo == nullptr || DestInfo == nullptr)
-	//{
-	//	return;
-	//}
-	
 	if (PlayerInfo->object_id() != 0) //object id를 변경하려는 시도가 있으면 비정상적임
 	{
 		assert(PlayerInfo->object_id() == Info.object_id());

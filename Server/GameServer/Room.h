@@ -44,6 +44,10 @@ private:
 
 	//Objects in the room
 	unordered_map<uint64, ObjectRef> Objects;
+
+public:
+
+	string ServerStartTime;
 };
 
 extern RoomRef GRoom;

@@ -17,14 +17,14 @@ void UUserChatWidget::NativeConstruct()
 
 }
 
-void UUserChatWidget::AddChat(FString Str)
+void UUserChatWidget::AddChat(FString Str, Protocol::ChatType ChatType)
 {
 	assert(ChatSlotBP);
 
 	auto chatSlot = CreateWidget<UChatSlotWidget>(this, ChatSlotBP);
 	if (IsValid(chatSlot))
 	{
-		chatSlot->SetChatText(Str);
+		chatSlot->SetChatText(Str, ChatType);
 
 		float prevOffset = ScrollBox_ChatScroll->GetScrollOffset();
 		float prevOffsetOfEnd = ScrollBox_ChatScroll->GetScrollOffsetOfEnd();

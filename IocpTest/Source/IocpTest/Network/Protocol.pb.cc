@@ -189,6 +189,7 @@ PROTOBUF_CONSTEXPR S2C_CHAT::S2C_CHAT(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.msg_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.playerid_)*/uint64_t{0u}
+  , /*decltype(_impl_.chattype_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct S2C_CHATDefaultTypeInternal {
   PROTOBUF_CONSTEXPR S2C_CHATDefaultTypeInternal()
@@ -301,6 +302,7 @@ const uint32_t TableStruct_Protocol_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::Protocol::S2C_CHAT, _impl_.playerid_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S2C_CHAT, _impl_.chattype_),
   PROTOBUF_FIELD_OFFSET(::Protocol::S2C_CHAT, _impl_.msg_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -351,8 +353,9 @@ const char descriptor_table_protodef_Protocol_2eproto[] PROTOBUF_SECTION_VARIABL
   "otocol.PosInfo\"+\n\010S2C_MOVE\022\037\n\004info\030\001 \001(\013"
   "2\021.Protocol.PosInfo\"\n\n\010C2S_JUMP\"\034\n\010S2C_J"
   "UMP\022\020\n\010playerId\030\001 \001(\004\"\027\n\010C2S_CHAT\022\013\n\003msg"
-  "\030\001 \001(\t\")\n\010S2C_CHAT\022\020\n\010playerId\030\001 \001(\004\022\013\n\003"
-  "msg\030\002 \001(\tb\006proto3"
+  "\030\001 \001(\t\"O\n\010S2C_CHAT\022\020\n\010playerId\030\001 \001(\004\022$\n\010"
+  "chatType\030\002 \001(\0162\022.Protocol.ChatType\022\013\n\003ms"
+  "g\030\003 \001(\tb\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_Protocol_2eproto_deps[2] = {
   &::descriptor_table_Enum_2eproto,
@@ -360,7 +363,7 @@ static const ::_pbi::DescriptorTable* const descriptor_table_Protocol_2eproto_de
 };
 static ::_pbi::once_flag descriptor_table_Protocol_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Protocol_2eproto = {
-    false, false, 577, descriptor_table_protodef_Protocol_2eproto,
+    false, false, 615, descriptor_table_protodef_Protocol_2eproto,
     "Protocol.proto",
     &descriptor_table_Protocol_2eproto_once, descriptor_table_Protocol_2eproto_deps, 2, 14,
     schemas, file_default_instances, TableStruct_Protocol_2eproto::offsets,
@@ -2336,6 +2339,7 @@ S2C_CHAT::S2C_CHAT(const S2C_CHAT& from)
   new (&_impl_) Impl_{
       decltype(_impl_.msg_){}
     , decltype(_impl_.playerid_){}
+    , decltype(_impl_.chattype_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -2347,7 +2351,9 @@ S2C_CHAT::S2C_CHAT(const S2C_CHAT& from)
     _this->_impl_.msg_.Set(from._internal_msg(), 
       _this->GetArenaForAllocation());
   }
-  _this->_impl_.playerid_ = from._impl_.playerid_;
+  ::memcpy(&_impl_.playerid_, &from._impl_.playerid_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.chattype_) -
+    reinterpret_cast<char*>(&_impl_.playerid_)) + sizeof(_impl_.chattype_));
   // @@protoc_insertion_point(copy_constructor:Protocol.S2C_CHAT)
 }
 
@@ -2358,6 +2364,7 @@ inline void S2C_CHAT::SharedCtor(
   new (&_impl_) Impl_{
       decltype(_impl_.msg_){}
     , decltype(_impl_.playerid_){uint64_t{0u}}
+    , decltype(_impl_.chattype_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.msg_.InitDefault();
@@ -2391,7 +2398,9 @@ void S2C_CHAT::Clear() {
   (void) cached_has_bits;
 
   _impl_.msg_.ClearToEmpty();
-  _impl_.playerid_ = uint64_t{0u};
+  ::memset(&_impl_.playerid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.chattype_) -
+      reinterpret_cast<char*>(&_impl_.playerid_)) + sizeof(_impl_.chattype_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -2409,9 +2418,18 @@ const char* S2C_CHAT::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx)
         } else
           goto handle_unusual;
         continue;
-      // string msg = 2;
+      // .Protocol.ChatType chatType = 2;
       case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_chattype(static_cast<::Protocol::ChatType>(val));
+        } else
+          goto handle_unusual;
+        continue;
+      // string msg = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
           auto str = _internal_mutable_msg();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
@@ -2454,14 +2472,21 @@ uint8_t* S2C_CHAT::_InternalSerialize(
     target = ::_pbi::WireFormatLite::WriteUInt64ToArray(1, this->_internal_playerid(), target);
   }
 
-  // string msg = 2;
+  // .Protocol.ChatType chatType = 2;
+  if (this->_internal_chattype() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteEnumToArray(
+      2, this->_internal_chattype(), target);
+  }
+
+  // string msg = 3;
   if (!this->_internal_msg().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_msg().data(), static_cast<int>(this->_internal_msg().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "Protocol.S2C_CHAT.msg");
     target = stream->WriteStringMaybeAliased(
-        2, this->_internal_msg(), target);
+        3, this->_internal_msg(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -2480,7 +2505,7 @@ size_t S2C_CHAT::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string msg = 2;
+  // string msg = 3;
   if (!this->_internal_msg().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
@@ -2490,6 +2515,12 @@ size_t S2C_CHAT::ByteSizeLong() const {
   // uint64 playerId = 1;
   if (this->_internal_playerid() != 0) {
     total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_playerid());
+  }
+
+  // .Protocol.ChatType chatType = 2;
+  if (this->_internal_chattype() != 0) {
+    total_size += 1 +
+      ::_pbi::WireFormatLite::EnumSize(this->_internal_chattype());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
@@ -2516,6 +2547,9 @@ void S2C_CHAT::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTO
   if (from._internal_playerid() != 0) {
     _this->_internal_set_playerid(from._internal_playerid());
   }
+  if (from._internal_chattype() != 0) {
+    _this->_internal_set_chattype(from._internal_chattype());
+  }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -2539,7 +2573,12 @@ void S2C_CHAT::InternalSwap(S2C_CHAT* other) {
       &_impl_.msg_, lhs_arena,
       &other->_impl_.msg_, rhs_arena
   );
-  swap(_impl_.playerid_, other->_impl_.playerid_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(S2C_CHAT, _impl_.chattype_)
+      + sizeof(S2C_CHAT::_impl_.chattype_)
+      - PROTOBUF_FIELD_OFFSET(S2C_CHAT, _impl_.playerid_)>(
+          reinterpret_cast<char*>(&_impl_.playerid_),
+          reinterpret_cast<char*>(&other->_impl_.playerid_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata S2C_CHAT::GetMetadata() const {

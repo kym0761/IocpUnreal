@@ -33,3 +33,9 @@ enum MoveState
 	MOVE_STATE_JUMP = 3;
 	MOVE_STATE_SKILL = 4;
 }
+
+enum ChatType
+{
+	CHAT_PLAYER = 0;
+	CHAT_SYSTEM = 1;
+}

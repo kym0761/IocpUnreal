@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "IocpTest.h"
 #include "ChatSlotWidget.generated.h"
 
 class UTextBlock;
@@ -23,6 +24,6 @@ protected:
 
 public:
 
-	void SetChatText(FString Str);
+	void SetChatText(FString Str, Protocol::ChatType ChatType);
 
 };

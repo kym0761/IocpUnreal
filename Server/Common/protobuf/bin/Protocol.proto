@@ -74,5 +74,6 @@ message C2S_CHAT
 message S2C_CHAT
 {
 	uint64 playerId = 1;
-	string msg = 2;
+	ChatType chatType = 2;
+	string msg = 3;
 }

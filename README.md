@@ -33,9 +33,9 @@ Send, Recv마다 따로 FRunnable로 worker를 구현한다.
 그 외에도 구현한 각 패킷에 대해 중앙 처리를 담당한다.
 
 ```
-Recv : 받은 패킷 -> Session -> GameInstance -> (패킷처리는 패킷에 따라 다름)
+Recv : 서버에게서 받은 패킷 -> Session -> GameInstance -> (서버에게서 받은 패킷에 따라 채팅, 이동, 로그인, 로그아웃 등이 업데이트)
 
-Send : 보내는 패킷 <- Session <- GameInstance <- (채팅, 이동, 로그아웃)
+Send : 서버로 보내는 패킷 <- Session <- GameInstance <- (클라이언트의 채팅, 이동, 로그인, 로그아웃 등의 행동)
 ```
 
 ### PacketSession
@@ -63,7 +63,7 @@ DummyClient는 테스트를 위한 클라이언트로, 언리얼 엔진을 클�
 
 그러므로, ServerCore와 GameServer만 설명한다.
 
-클래스들의 명칭 앞에 F 붙은 이유는 언리얼 사용하면서 대부분의 사용자 클래스와 구조체에 F가 붙게 만들도록 한 것이 익숙하여 F를 붙임. 
+클래스들의 명칭 앞에 F 붙은 이유는 언리얼 사용하면서 사용자 클래스와 구조체에 F가 붙게 만들도록 한 것이 익숙하여 F를 붙임. 
 
 예를 들면, FListener 클래스 이름을 설정하면 FListener Listener; 처럼 인스턴스 이름을 설정할 때 편함.
 
@@ -81,7 +81,7 @@ cpp 파일에 FCoreGlobal GCoreGlobal;로 글로벌 클래스가 생성되면서
 
 ### Main/CoreMacro
 
-Lock, CRASH 등을 매크로로 지정한 헤더 파일
+LOCK, CRASH 등을 매크로로 지정한 헤더 파일
 
 ### Main/CorePch.h
 
@@ -90,6 +90,10 @@ Lock, CRASH 등을 매크로로 지정한 헤더 파일
 ### Main/CoreTLS
 
 Thread Local Storage 변수를 정리해놓은 .h 및 .cpp
+
+Thread Local Storage는 전역변수처럼 선언해놓았지만, 실제로는 멀티쓰레드 환경에서 쓰레드마다 독립적으로 존재하는 변수다.
+
+쓰레드마다 독립적으로 존재하므로 이 변수를 사용할 때 경합이 일어나지 않기 때문에 Lock을 걸 필요가 없음.
 
 ### Main/Types.h
 
@@ -229,6 +233,10 @@ JobTimer는 예약시간을 정하여 JobQueue에 원하는 Job을 넣어 처리
 
 ## GameServer
 
+실질적인 서버 역할을 하는 프로젝트
+
+ServerCore의 정적라이브러리를 기반으로 실행되므로 ServerCore가 빌드가 되지 않은 상태에선 빌드 및 실행되지 않으니 주의할 것.
+
 ### Main/GameServer.cpp
 
 Service 생성 및 실행.
@@ -249,7 +257,7 @@ GameSession에서 OnConnect() OnDisconnect()에서 GameSession을 추가/제거�
 
 만약 SendBuffer의 내용을 전체 클라이언트에게 보낼 계획이면 Broadcast()를 사용하여 전체 클라이언트에서 패킷을 보낼 수 있음.
 
-### ServerPacketHandler
+### Main/ServerPacketHandler
 
 ProtoBuffer를 사용하여 생성된 패킷을 처리한다.
 

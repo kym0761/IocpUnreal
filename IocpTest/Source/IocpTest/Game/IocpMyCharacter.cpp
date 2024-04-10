@@ -74,6 +74,9 @@ void AIocpMyCharacter::Tick(float DeltaTime)
 		SetMoveState(Protocol::MOVE_STATE_RUN);
 	}
 
+	//MovePacketSendTimer = 0.2f
+	//클라이언트는 플레이어의 입력이 바뀌지 않는 이상 0.2초마다 이동에 대한 패킷을 보낸다.
+	//입력 값이 변경되면 즉시 보내 서버에 반영한다.
 	MovePacketSendTimer -= DeltaTime;
 
 	if (MovePacketSendTimer <= 0 || bForceSendPacket == true)

@@ -2122,10 +2122,11 @@ class S2C_CHAT final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kMsgFieldNumber = 2,
+    kMsgFieldNumber = 3,
     kPlayerIdFieldNumber = 1,
+    kChatTypeFieldNumber = 2,
   };
-  // string msg = 2;
+  // string msg = 3;
   void clear_msg();
   const std::string& msg() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -2148,6 +2149,15 @@ class S2C_CHAT final :
   void _internal_set_playerid(uint64_t value);
   public:
 
+  // .Protocol.ChatType chatType = 2;
+  void clear_chattype();
+  ::Protocol::ChatType chattype() const;
+  void set_chattype(::Protocol::ChatType value);
+  private:
+  ::Protocol::ChatType _internal_chattype() const;
+  void _internal_set_chattype(::Protocol::ChatType value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Protocol.S2C_CHAT)
  private:
   class _Internal;
@@ -2158,6 +2168,7 @@ class S2C_CHAT final :
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr msg_;
     uint64_t playerid_;
+    int chattype_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -2752,7 +2763,27 @@ inline void S2C_CHAT::set_playerid(uint64_t value) {
   // @@protoc_insertion_point(field_set:Protocol.S2C_CHAT.playerId)
 }
 
-// string msg = 2;
+// .Protocol.ChatType chatType = 2;
+inline void S2C_CHAT::clear_chattype() {
+  _impl_.chattype_ = 0;
+}
+inline ::Protocol::ChatType S2C_CHAT::_internal_chattype() const {
+  return static_cast< ::Protocol::ChatType >(_impl_.chattype_);
+}
+inline ::Protocol::ChatType S2C_CHAT::chattype() const {
+  // @@protoc_insertion_point(field_get:Protocol.S2C_CHAT.chatType)
+  return _internal_chattype();
+}
+inline void S2C_CHAT::_internal_set_chattype(::Protocol::ChatType value) {
+  
+  _impl_.chattype_ = value;
+}
+inline void S2C_CHAT::set_chattype(::Protocol::ChatType value) {
+  _internal_set_chattype(value);
+  // @@protoc_insertion_point(field_set:Protocol.S2C_CHAT.chatType)
+}
+
+// string msg = 3;
 inline void S2C_CHAT::clear_msg() {
   _impl_.msg_.ClearToEmpty();
 }
