@@ -54,6 +54,29 @@ BaseCharacter는 다른 클라이언트가 Move할 때마다 서버에서 해당
 
 반대로, MyCharacter는 내가 스스로 WASD, 스페이스바 등의 입력으로 움직일 수 있는데, 이 움직임에 맞춰서 서버에 패킷을 보내고 다른 클라이언트에도 내 움직임을 반영하도록 할 것이다.
 
+### Test(Chat)
+
+<img src="ExplainImages/Chat01.png" width="100%">
+```
+최초 서버 가동 및 클라이언트 2개 실행 및 로그인 &둘의 채팅 내역
+```
+<img src="ExplainImages/Chat02.png" width="100%">
+```
+클라이언트 1개 추가로 실행
+```
+<img src="ExplainImages/Chat03.png" width="100%">
+```
+추가된 클라이언트에서 한글로 채팅
+```
+<img src="ExplainImages/Chat04.png" width="100%">
+```
+추가로 들어온 클라이언트 로그아웃
+```
+<img src="ExplainImages/Chat05.png" width="100%">
+```
+모든 클라이언트가 로그아웃하여 빈 서버가 됨.
+이후에도 클라이언트가 로그인하면 각 플레이어가 채팅 가능
+```
 
 # Server
 
@@ -134,6 +157,10 @@ RecvBuffer에 정리된 내용대로, ReadPos 와 WritePos의 위치가 같아�
 
 Recv와 아래 Send 버퍼는 Session에서 사용될 것이다.
 
+RecvBuffer가 1개인 이유는, 클라이언트가 보내는 데이터에 반응하고, 보내지않으면 반응할 것이 없는 수동적인 버퍼다.
+
+만약 서버가 RecvBuffer를 읽고 있는 중에 클라이언트가 데이터를 보냈다고 해도, RecvBuffer를 등록하기 전까지 Recv가 유예되는 것일 뿐 큰 문제는 없기 때문임.
+
 #### Recv 동작 설명
 
 1. RegisterRecv에서 RecvBuffer 주소와 공간을 WSABUF에 넣은 뒤, RecvEvent로 복귀한 이벤트를 WSARecv()로 IOCP에 등록한다.
@@ -146,7 +173,7 @@ Recv와 아래 Send 버퍼는 Session에서 사용될 것이다.
 
 Send에 사용할 버퍼.
 
-Send의 구조 자체는 복잡하지 않다. 서버에서 보낼 데이터 크기만큼 Buffer를 지정한 뒤 WSASend()하면 된다.
+Send는 서버에서 보낼 데이터 크기만큼 Buffer를 지정한 뒤 WSASend()하면 된다.
 
 다만, Send는 1개의 SendBuffer에 대해서만 Send() 동작하는 것이 아니라, Queue에 SendBuffer 담아둔 뒤 Queue에 있는 내용 전부를 WSABUF에 넣어 한번에 여러개의 SendBuffer의 내용을 WSASend()한다.
 
@@ -189,10 +216,6 @@ FGameSession의 OnRecvPacket()을 통해 받은 패킷의 헤더를 읽어 패�
 ### Thread/ThreadManager
 
 다수의 쓰레드를 운용하기 위한 싱글톤 Manager 클래스.
-
-### Utils/BufferReader
-
-### Utils/BufferReader
 
 ### Utils/LockQueue
 

@@ -25,7 +25,7 @@ void FSession::Send(SendBufferRef sendBuffer)
 	bool bRegisterSend = false;
 
 	{
-		// 현재 RegisterSend가 걸리지 않은 상태라면, 걸어준다
+		// 현재 RegisterSend()가 걸리지 않은 상태라면, 걸어준다
 		WRITE_LOCK;
 
 		//아직 bSendRegistered가 통과되지 않았다면 sendbuffer에 있는 데이터를 sendqueue에 넣어 한번에 보낼 준비를 한다.
@@ -182,11 +182,12 @@ void FSession::RegisterRecv()
 	RecvEvent.Init();
 	RecvEvent.SetOwner(shared_from_this()); // ADD_REF
 
+	//buf 위치부터 len까지 recv에 쓰도록 해라는 의미
 	WSABUF wsaBuf;
 	wsaBuf.buf = reinterpret_cast<char*>(RecvBuffer.GetWritePos());
 	wsaBuf.len = RecvBuffer.GetFreeSize();
 
-	//Iocp에서는 send대신 WSARecv를 사용함.
+	//Iocp에서는 Recv대신 WSARecv를 사용함.
 	//Recv이벤트를 Iocp에 등록
 	DWORD numOfBytes = 0;
 	DWORD flags = 0;
@@ -239,7 +240,7 @@ void FSession::RegisterSend()
 
 	// Scatter-Gather (흩어져 있는 데이터들을 모아서 한번에 보냄)
 	//보내야하는 데이터를 저장하는 것이 아니라. 보내야할 데이터의 위치를 알려주는 역할이다.
-	//WASSend로 넘어가면 커널에서 처리함
+	//WSASend로 넘어가면 커널에서 처리함
 	vector<WSABUF> wsaBufs;
 	wsaBufs.reserve(SendEvent.SendBuffers.size());
 	for (SendBufferRef sendBuffer : SendEvent.SendBuffers)
@@ -256,7 +257,7 @@ void FSession::RegisterSend()
 	if (SOCKET_ERROR == ::WSASend(
 		Socket,
 		wsaBufs.data(), //데이터의 위치
-		static_cast<DWORD>(wsaBufs.size()), //보낼 데이터의 크기
+		static_cast<DWORD>(wsaBufs.size()), //보낼 데이터의 개수
 		OUT &numOfBytes,
 		0,
 		&SendEvent,
@@ -266,9 +267,9 @@ void FSession::RegisterSend()
 		if (errorCode != WSA_IO_PENDING)//펜딩을 제외한 실패는 레퍼런스 카운트로 살려주고 있던 오브젝트들을 전부 풀어줘야함.
 		{
 			HandleError(errorCode);
-			SendEvent.SetOwner(nullptr); // RELEASE_REF
-			SendEvent.SendBuffers.clear(); // RELEASE_REF
-			bSendRegistered.store(false);
+			SendEvent.SetOwner(nullptr); // IocpObject에 대한 RELEASE_REF
+			SendEvent.SendBuffers.clear(); // 보내기 예약을 했던 SendBuffer들에 대한 RELEASE_REF
+			bSendRegistered.store(false); //Send()
 		}
 	}
 }
@@ -337,8 +338,8 @@ void FSession::ProcessRecv(int32 numOfBytes)
 
 void FSession::ProcessSend(int32 numOfBytes)
 {
-	SendEvent.SetOwner(nullptr); // RELEASE_REF
-	SendEvent.SendBuffers.clear(); // RELEASE_REF
+	SendEvent.SetOwner(nullptr); // IocpObject에 대한 RELEASE_REF
+	SendEvent.SendBuffers.clear(); // 보내기 예약을 했던 SendBuffer들에 대한 RELEASE_REF
 
 
 	if (numOfBytes == 0)

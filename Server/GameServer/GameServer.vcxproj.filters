@@ -34,6 +34,9 @@
     <Filter Include="GameContents\Object">
       <UniqueIdentifier>{8318dfcc-e478-417f-b900-f8116e272a5d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameContents\Object\NotUsed">
+      <UniqueIdentifier>{04994b73-905c-4904-9b0c-1bc4987dbbb0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConcurrentStack.cpp">
@@ -93,11 +96,11 @@
     <ClCompile Include="Creature.cpp">
       <Filter>GameContents\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Monster.cpp">
-      <Filter>GameContents\Object</Filter>
-    </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>GameContents\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Monster.cpp">
+      <Filter>GameContents\Object\NotUsed</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -164,11 +167,11 @@
     <ClInclude Include="Creature.h">
       <Filter>GameContents\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Monster.h">
-      <Filter>GameContents\Object</Filter>
-    </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>GameContents\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster.h">
+      <Filter>GameContents\Object\NotUsed</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

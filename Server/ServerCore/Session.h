@@ -65,7 +65,7 @@ private:
 	void				HandleError(int32 errorCode);
 
 protected:
-	/* 컨텐츠 코드에서 오버로딩해서 쓰게 될 함수 */
+	/* 컨텐츠 코드에서 오버라이딩해서 쓰게 될 함수 */
 	virtual void		OnConnected() { }
 	virtual int32		OnRecv(BYTE* buffer, int32 len) { return len; }
 	virtual void		OnSend(int32 len) { }
