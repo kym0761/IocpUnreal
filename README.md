@@ -57,26 +57,29 @@ BaseCharacter는 다른 클라이언트가 Move할 때마다 서버에서 해당
 ### Test(Chat)
 
 <img src="ExplainImages/Chat01.png" width="100%">
-```
+
 최초 서버 가동 및 클라이언트 2개 실행 및 로그인 &둘의 채팅 내역
-```
+
 <img src="ExplainImages/Chat02.png" width="100%">
-```
+
 클라이언트 1개 추가로 실행
-```
+
 <img src="ExplainImages/Chat03.png" width="100%">
-```
+
 추가된 클라이언트에서 한글로 채팅
-```
+
 <img src="ExplainImages/Chat04.png" width="100%">
-```
+
 추가로 들어온 클라이언트 로그아웃
-```
+
 <img src="ExplainImages/Chat05.png" width="100%">
-```
+
 모든 클라이언트가 로그아웃하여 빈 서버가 됨.
 이후에도 클라이언트가 로그인하면 각 플레이어가 채팅 가능
-```
+
+<img src="ExplainImages/Chat06.png" width="100%">
+
+서버가 가동한 시간을 기점으로, 서버가 종료될 때까지 채팅 내역을 저장하여 로그로 남김
 
 # Server
 
