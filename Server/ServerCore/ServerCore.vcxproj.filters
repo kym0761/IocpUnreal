@@ -90,12 +90,6 @@
     <ClCompile Include="SendBuffer.cpp">
       <Filter>Network</Filter>
     </ClCompile>
-    <ClCompile Include="BufferReader.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="BufferWriter.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Job.cpp">
       <Filter>Job</Filter>
     </ClCompile>
@@ -143,6 +137,12 @@
     </ClCompile>
     <ClCompile Include="SocketUtils.cpp">
       <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferReader.cpp">
+      <Filter>Utils\NotUse</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferWriter.cpp">
+      <Filter>Utils\NotUse</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -215,12 +215,6 @@
     <ClInclude Include="SendBuffer.h">
       <Filter>Network</Filter>
     </ClInclude>
-    <ClInclude Include="BufferWriter.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="BufferReader.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Job.h">
       <Filter>Job</Filter>
     </ClInclude>
@@ -276,6 +270,12 @@
       <Filter>Thread\NotUse</Filter>
     </ClInclude>
     <ClInclude Include="FileUtils.h">
+      <Filter>Utils\NotUse</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferWriter.h">
+      <Filter>Utils\NotUse</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferReader.h">
       <Filter>Utils\NotUse</Filter>
     </ClInclude>
   </ItemGroup>

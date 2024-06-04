@@ -4,7 +4,49 @@
 
 언리얼 데디케이티드 서버가 아닌 C++ 소켓을 사용함.
 
+Protobuffer를 사용하기 때문에 Protobuffer 라이브러리와 코드가 필요하다.
+
 서버는 설명할 내용이 길어 클라이언트의 설명을 먼저한 뒤에 서버 설명을 적어놓는다.
+
+# 언리얼 프로젝트 세팅
+
+Source 폴더에 Protobuffer를 넣을 폴더가 필요하며, Protobuffer를 모듈로 만들 .Build.cs 파일이 필요하다.
+
+.Build.cs 파일은 프로젝트 생성시 있는 기본 소스의 .cs를 복사해서 이름만 바꾸고 넣는다.
+
+Protobuffer폴더/Include에는 Protobuffer에서 사용할 소스코드들을 넣는다. (경로가 Include/google/~~~일 것)   
+Protobuffer폴더/Lib에는 빌드된 Protobuffer의 lib 파일을 넣어준다.
+
+```
+using System.IO;
+using UnrealBuildTool;
+
+//ProtoBufCore 모듈
+public class ProtobufCore : ModuleRules
+{
+	public ProtobufCore(ReadOnlyTargetRules Target) : base(Target)
+	{
+		Type = ModuleType.External;
+
+		//경로 : google/~~~
+		PublicSystemIncludePaths.Add(Path.Combine(ModuleDirectory, "Include"));
+		PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Include"));
+
+		//.lib 파일
+		PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Lib", "Win64", "libprotobuf.lib"));
+
+		PublicDefinitions.Add("GOOGLE_PROTOBUF_NO_RTTI=1");
+	}
+}
+```
+모듈의 .Build.cs는 이렇게 만들어준다.
+
+게임 프로젝트의 메인 코드의 .Build.cs는 만들어진 모듈 경로를 추가시켜주어야 한다.
+```
+        PrivateDependencyModuleNames.AddRange(new string[] { "ProtobufCore" });
+```
+만든 모듈의 이름을 이렇게 넣으면 정상적으로 동작한다.
+
 
 # IocpTest
 
